@@ -139,11 +139,32 @@ export const TouchButton: React.FC<TouchButtonProps> = ({
 
   const widthClass = fullWidth ? 'w-full' : '';
 
+  // Filter out props that conflict with Framer Motion
+  const {
+    onDrag,
+    onDragEnd,
+    onDragEnter,
+    onDragLeave,
+    onDragOver,
+    onDragStart,
+    onDrop,
+    onAnimationStart,
+    onAnimationEnd,
+    onAnimationIteration,
+    form,
+    formAction,
+    formEncType,
+    formMethod,
+    formNoValidate,
+    formTarget,
+    ...motionProps
+  } = props;
+
   return (
     <motion.button
       whileTap={{ scale: 0.95 }}
       className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${widthClass} ${className}`}
-      {...props}
+      {...motionProps}
     >
       {children}
     </motion.button>
