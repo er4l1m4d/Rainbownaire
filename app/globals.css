@@ -1,0 +1,500 @@
+@import "tailwindcss";
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+
+  /* Rainbow Color Variables */
+  --rainbow-primary: #667eea;
+  --rainbow-secondary: #764ba2;
+  --rainbow-accent: #f093fb;
+  --rainbow-warning: #f5576c;
+  --rainbow-success: #4facfe;
+
+  /* Typography */
+  --font-primary: 'DM Sans', system-ui, -apple-system, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  font-family: var(--font-primary);
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Enhanced rainbow gradient animations with full spectrum */
+@keyframes rainbow-flow {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 100% 50%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes rainbow-rotate {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+@keyframes rainbow-wave {
+  0%, 100% { background-position: 0% 50%; }
+  16.66% { background-position: 100% 50%; }
+  33.33% { background-position: 100% 100%; }
+  50% { background-position: 0% 100%; }
+  66.66% { background-position: 0% 0%; }
+  83.33% { background-position: 100% 0%; }
+}
+
+/* Full rainbow spectrum gradients */
+.rainbow-gradient {
+  background: linear-gradient(-45deg,
+    #ff0000,    /* Red */
+    #ff8000,    /* Orange */
+    #ffff00,    /* Yellow */
+    #80ff00,    /* Chartreuse */
+    #00ff00,    /* Green */
+    #00ff80,    /* Spring Green */
+    #00ffff,    /* Cyan */
+    #0080ff,    /* Blue */
+    #8000ff,    /* Purple */
+    #ff00ff,    /* Magenta */
+    #ff0080     /* Hot Pink */
+  );
+  background-size: 1000% 1000%;
+  animation: rainbow-wave 8s ease infinite;
+}
+
+.rainbow-text {
+  background: linear-gradient(-45deg,
+    #ff0000,    /* Red */
+    #ff8000,    /* Orange */
+    #ffff00,    /* Yellow */
+    #80ff00,    /* Chartreuse */
+    #00ff00,    /* Green */
+    #00ff80,    /* Spring Green */
+    #00ffff,    /* Cyan */
+    #0080ff,    /* Blue */
+    #8000ff,    /* Purple */
+    #ff00ff,    /* Magenta */
+    #ff0080     /* Hot Pink */
+  );
+  background-size: 1000% 1000%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbow-flow 6s ease infinite;
+  color: #ff0000; /* Fallback for browsers that don't support background-clip */
+}
+
+/* Custom pulse for rainbow elements */
+@keyframes rainbow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 0, 128, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 15px rgba(255, 0, 128, 0);
+  }
+}
+
+.rainbow-pulse {
+  animation: rainbow-pulse 3s infinite;
+}
+
+/* Custom loading spinner */
+@keyframes spin-rainbow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinner-rainbow {
+  border: 3px solid transparent;
+  border-top: 3px solid #ff0000;    /* Red */
+  border-right: 3px solid #ff8000;  /* Orange */
+  border-bottom: 3px solid #ffff00; /* Yellow */
+  border-left: 3px solid #00ff00;   /* Green */
+  border-radius: 50%;
+  animation: spin-rainbow 1s linear infinite;
+}
+
+/* Custom button styles with enhanced rainbow */
+.btn-rainbow {
+  @apply relative overflow-hidden rounded-xl px-6 py-3 font-semibold text-white transition-all duration-300;
+  background: linear-gradient(-45deg,
+    #ff0000,    /* Red */
+    #ff8000,    /* Orange */
+    #ffff00,    /* Yellow */
+    #80ff00,    /* Chartreuse */
+    #00ff00,    /* Green */
+    #00ff80,    /* Spring Green */
+    #00ffff,    /* Cyan */
+    #0080ff,    /* Blue */
+    #8000ff,    /* Purple */
+    #ff00ff,    /* Magenta */
+    #ff0080     /* Hot Pink */
+  );
+  background-size: 1000% 1000%;
+  animation: rainbow-wave 8s ease infinite;
+}
+
+.btn-rainbow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(255, 0, 128, 0.3);
+  animation-duration: 4s;
+}
+
+.btn-rainbow:active {
+  transform: translateY(0);
+  animation-duration: 2s;
+}
+
+/* Progress bar styles with enhanced rainbow */
+.progress-rainbow {
+  background: linear-gradient(90deg,
+    #ff0000,    /* Red */
+    #ff8000,    /* Orange */
+    #ffff00,    /* Yellow */
+    #80ff00,    /* Chartreuse */
+    #00ff00,    /* Green */
+    #00ff80,    /* Spring Green */
+    #00ffff,    /* Cyan */
+    #0080ff,    /* Blue */
+    #8000ff,    /* Purple */
+    #ff00ff,    /* Magenta */
+    #ff0080     /* Hot Pink */
+  );
+  background-size: 1000% 100%;
+  animation: rainbow-wave 6s ease infinite;
+}
+
+/* Answer option styles */
+.answer-option {
+  @apply relative rounded-lg border-2 border-gray-200 bg-white p-4 transition-all duration-200 hover:border-purple-300 hover:shadow-md;
+}
+
+.answer-option.selected {
+  @apply border-purple-500 bg-purple-50;
+}
+
+.answer-option.correct {
+  @apply border-green-500 bg-green-50;
+  animation: correct-glow 0.5s ease-in-out;
+}
+
+.answer-option.incorrect {
+  @apply border-red-500 bg-red-50;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes correct-glow {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+  50% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0.2); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Lifeline button styles */
+.lifeline-btn {
+  @apply relative rounded-full p-3 transition-all duration-200;
+}
+
+.lifeline-btn.active {
+  @apply bg-gradient-to-r from-purple-400 to-pink-400 text-white shadow-lg;
+  animation: rainbow-pulse 2s infinite;
+}
+
+.lifeline-btn.used {
+  @apply bg-gray-200 text-gray-400;
+  cursor: not-allowed;
+}
+
+/* Score display styles */
+.score-display {
+  @apply rounded-xl bg-white/20 backdrop-blur-sm px-4 py-2 text-white font-bold;
+}
+
+/* Modal styles */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50;
+}
+
+.modal-content {
+  @apply relative bg-white rounded-xl shadow-2xl max-w-md w-full mx-4;
+}
+
+/* Responsive text scaling */
+@media (max-width: 640px) {
+  .text-responsive-lg {
+    font-size: 1.5rem;
+  }
+  .text-responsive-xl {
+    font-size: 1.75rem;
+  }
+}
+
+@media (min-width: 641px) {
+  .text-responsive-lg {
+    font-size: 2rem;
+  }
+  .text-responsive-xl {
+    font-size: 2.5rem;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .rainbow-gradient,
+  .rainbow-text,
+  .progress-rainbow {
+    animation: none;
+  }
+  
+  .rainbow-pulse,
+  .lifeline-btn.active {
+    animation: none;
+  }
+}
+
+/* Focus styles for keyboard navigation */
+.focus-rainbow:focus-visible {
+  @apply outline-none ring-2 ring-purple-500 ring-offset-2;
+}
+
+/* Hover effects */
+.hover-lift {
+  transition: transform 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+.hover-glow {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+}
+
+/* Rainbow border effect for cards and containers */
+.rainbow-border {
+  background: linear-gradient(90deg,
+    #ff0000, #ff8000, #ffff00, #80ff00, #00ff00,
+    #00ff80, #00ffff, #0080ff, #8000ff, #ff00ff, #ff0080
+  );
+  background-size: 200% 100%;
+  border-radius: 12px;
+  padding: 2px;
+  animation: rainbow-wave 4s linear infinite;
+}
+
+.rainbow-border > * {
+  background: white;
+  border-radius: 10px;
+}
+
+/* Rainbow glow effect */
+.rainbow-glow {
+  box-shadow: 0 0 20px rgba(255, 0, 128, 0.3);
+  animation: rainbow-pulse 4s infinite;
+}
+
+/* Rainbow hover effects */
+.rainbow-hover {
+  transition: all 0.3s ease;
+}
+
+.rainbow-hover:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(255, 0, 128, 0.2);
+  animation: rainbow-pulse 2s infinite;
+}
+
+/* Glass morphism effect */
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Bounce in animation */
+@keyframes bounce-in {
+  0% { transform: scale(0.3) translate3d(0, 0, 0); opacity: 0; }
+  50% { opacity: 1; }
+  75% { transform: scale(1.05); }
+  100% { transform: scale(1) translate3d(0, 0, 0); opacity: 1; }
+}
+
+/* Touch and mobile optimizations */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Prevent zoom on input focus (iOS) */
+@media screen and (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Safe area padding for mobile devices with notches */
+@supports (padding: max(0px)) {
+  .safe-area-padding {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* Mobile-first responsive utilities */
+.mobile-hidden {
+  @apply block;
+}
+
+@media (max-width: 640px) {
+  .mobile-hidden {
+    @apply hidden;
+  }
+}
+
+.desktop-hidden {
+  @apply hidden;
+}
+
+@media (min-width: 641px) {
+  .desktop-hidden {
+    @apply block;
+  }
+}
+
+/* Improved mobile scrolling */
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile-optimized animations */
+@media (max-width: 768px) {
+  .reduce-motion-mobile {
+    animation-duration: 0.3s !important;
+  }
+}
+
+/* Landscape orientation fixes */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  .mobile-landscape-compact {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .rainbow-gradient,
+  .rainbow-text,
+  .progress-rainbow {
+    background: #000 !important;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+  }
+
+  .btn-rainbow {
+    background: #000 !important;
+    color: #fff !important;
+    border: 2px solid #fff !important;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .rainbow-gradient,
+  .rainbow-text,
+  .progress-rainbow,
+  .rainbow-pulse,
+  .lifeline-btn.active,
+  .float,
+  .bounce-in {
+    animation: none !important;
+  }
+}
+
+/* Focus indicators for keyboard navigation */
+.focus-visible:focus-visible {
+  @apply outline-none ring-2 ring-purple-500 ring-offset-2;
+}
+
+/* Focus within for containers */
+.focus-within\:ring-2:focus-within {
+  @apply ring-2 ring-purple-200;
+}
+
+/* High contrast focus styles */
+@media (prefers-contrast: high) {
+  .focus-visible:focus-visible {
+    @apply ring-4 ring-yellow-400 ring-offset-4;
+  }
+}
