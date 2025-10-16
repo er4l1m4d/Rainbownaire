@@ -4,10 +4,6 @@ export interface AIQuestionPrompt {
   difficulty: 'easy' | 'medium' | 'hard';
 }
 
-export interface HuggingFaceResponse {
-  generated_text: string;
-}
-
 export interface AIGeneratedQuestion {
   question: string;
   options: string[];
