@@ -41,9 +41,6 @@ function ResultsContent() {
   const [scorecardImageUrl, setScorecardImageUrl] = useState<string>('');
   const [nickname, setNickname] = useState<string>('');
 
-  // Get display name for personalization
-  const displayName = getDisplayName(address, nickname) || 'Quiz Player';
-
   useEffect(() => {
     if (!isConnected) {
       router.push('/');
@@ -209,7 +206,7 @@ function ResultsContent() {
         >
           {/* Final Score */}
           <div className="mb-8">
-            <div className="text-gray-700 text-lg mb-2">{displayName}, here is your final score!</div>
+            <div className="text-gray-700 text-lg mb-2">Your Final Score</div>
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -285,7 +282,7 @@ function ResultsContent() {
           className="mt-8"
         >
           <p className="text-gray-600 mb-4 text-sm">
-            Generate your personalized scorecard to share your achievement! 🎉
+            Share your score with friends and challenge them! 🚀
           </p>
 
           <div className="flex flex-wrap justify-center gap-3 mb-4">
@@ -322,7 +319,7 @@ function ResultsContent() {
               fontSize: '18px',
               marginBottom: '8px',
               fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif"
-            }}>{displayName}, here is your final score!</h2>
+            }}>{getDisplayName(address, nickname) || 'Quiz Player'}, here is your final score!</h2>
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}

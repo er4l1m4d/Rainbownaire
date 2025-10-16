@@ -18,33 +18,17 @@ export const metadata: Metadata = {
     icon: '/favicon.png',
     shortcut: '/favicon.png',
     apple: '/favicon.png',
-    other: [
-      {
-        rel: 'icon',
-        type: 'image/png',
-        url: '/favicon.png',
-      },
-    ],
   },
   openGraph: {
     title: 'Rainbownaire - Web3 Quiz Game',
     description: 'Test your Web3 knowledge and become a Rainbownaire!',
     type: 'website',
     locale: 'en_US',
-    images: [
-      {
-        url: '/favicon.png',
-        width: 512,
-        height: 512,
-        alt: 'Rainbownaire Logo',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Rainbownaire - Web3 Quiz Game',
     description: 'Test your Web3 knowledge and become a Rainbownaire!',
-    images: ['/favicon.png'],
   },
 }
 
@@ -63,7 +47,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={dmSans.className} suppressHydrationWarning>
         <Providers>
-          <main className="min-h-screen bg-white">
+          <main className="min-h-screen bg-white" suppressHydrationWarning>
             {children}
           </main>
         </Providers>
