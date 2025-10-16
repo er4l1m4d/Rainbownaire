@@ -5,7 +5,7 @@ const nextConfig = {
     domains: ['localhost'],
   },
   experimental: {
-    optimizeCss: true,
+    optimizeCss: false, // Disabled to prevent critters dependency issues in deployment
     scrollRestoration: true,
   },
   webpack: (config) => {
