@@ -14,16 +14,37 @@ export const metadata: Metadata = {
   description: 'A Web3 twist on the classic "Who Wants to Be a Millionaire," built for the Rainbow Wallet community.',
   keywords: ['Web3', 'Quiz', 'Rainbow Wallet', 'Crypto', 'Game'],
   authors: [{ name: 'Rainbownaire Team' }],
+  icons: {
+    icon: '/favicon.png',
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
+    other: [
+      {
+        rel: 'icon',
+        type: 'image/png',
+        url: '/favicon.png',
+      },
+    ],
+  },
   openGraph: {
     title: 'Rainbownaire - Web3 Quiz Game',
     description: 'Test your Web3 knowledge and become a Rainbownaire!',
     type: 'website',
     locale: 'en_US',
+    images: [
+      {
+        url: '/favicon.png',
+        width: 512,
+        height: 512,
+        alt: 'Rainbownaire Logo',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Rainbownaire - Web3 Quiz Game',
     description: 'Test your Web3 knowledge and become a Rainbownaire!',
+    images: ['/favicon.png'],
   },
 }
 
