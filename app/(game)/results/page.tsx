@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getDisplayName, getStoredNickname } from '@/lib/utils/user';
 import { sampleQuestions } from '@/lib/data/sampleQuestions';
 import html2canvas from 'html2canvas';
+import { usePFP } from '@/hooks/usePFP';
+import Image from 'next/image';
 
 // Helper function to determine score rank
 const getScoreRank = (score: number): string => {
@@ -26,11 +28,20 @@ function ResultsContent() {
   const searchParams = useSearchParams();
   const { isConnected, address } = useAccount();
 
+  // PFP management
+  const { pfpData } = usePFP();
+
   const score = parseInt(searchParams.get('score') || '0');
-  const totalQuestions = sampleQuestions.length;
+  const correctAnswers = parseInt(searchParams.get('correct') || '0');
+  const totalQuestions = sampleQuestions.length; // This will be 15 for the random selection
   const maxPossibleScore = totalQuestions * 100; // Base score only
   const percentage = Math.round((score / maxPossibleScore) * 100);
+  const accuracyPercentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
   const rank = getScoreRank(score);
+
+  // Calculate Rainbow Wallet bonus (15% of base score)
+  const baseScore = Math.round(score / 1.15); // Reverse calculate base score
+  const rainbowBonus = score - baseScore;
 
   // Tweet text for social sharing
   const tweetText = `I just scored ${score} points in Rainbownaire quiz! 🌈 ${rank} Can you beat my score?`;
@@ -174,7 +185,7 @@ function ResultsContent() {
   }
 
   return (
-    <div className="min-h-screen p-4 py-8" suppressHydrationWarning={true}>
+    <div className="min-h-screen flex items-center justify-center p-4 py-8" suppressHydrationWarning={true}>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -182,28 +193,23 @@ function ResultsContent() {
         className="max-w-2xl mx-auto text-center"
         suppressHydrationWarning={true}
       >
-        {/* Celebration Message */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-8"
-        >
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">
-            <span className="rainbow-text">Congratulations!</span>
-          </h1>
-          <p className="text-2xl text-black font-bold">
-            You've completed the quiz! 🎉
-          </p>
-        </motion.div>
-
         {/* Score Card */}
         <motion.div
-          className="score-card-screenshot bg-gray-50 rounded-2xl p-8 mb-8 border-2 border-gray-200"
+          className="bg-white rounded-2xl p-8 border border-gray-200"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
+          {/* Congratulations Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              <span className="rainbow-text">Congratulations!</span>
+            </h1>
+            <p className="text-xl text-black font-bold">
+              You've completed the quiz! 🎉
+            </p>
+          </div>
+
           {/* Final Score */}
           <div className="mb-8">
             <div className="text-gray-700 text-lg mb-2">Your Final Score</div>
@@ -215,18 +221,24 @@ function ResultsContent() {
             >
               {score}
             </motion.div>
+            {rainbowBonus > 0 && (
+              <div className="text-sm text-purple-600 mb-2 flex items-center justify-center gap-1">
+                <span>🌈</span>
+                <span>+{rainbowBonus} Rainbow Wallet bonus!</span>
+              </div>
+            )}
             <div className="text-2xl font-bold text-purple-600 mb-4">{rank}</div>
             
             {/* Progress Bar */}
             <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: `${percentage}%` }}
+                animate={{ width: `${accuracyPercentage}%` }}
                 transition={{ delay: 0.8, duration: 1 }}
                 className="h-full progress-rainbow"
               />
             </div>
-            <div className="text-sm text-gray-600 mt-2">{percentage}% of max score</div>
+            <div className="text-sm text-gray-600 mt-2">{accuracyPercentage}% of questions answered correctly</div>
           </div>
 
           {/* Stats */}
@@ -239,7 +251,7 @@ function ResultsContent() {
             
             <div className="bg-white rounded-xl p-4">
               <div className="text-3xl mb-2">💯</div>
-              <div className="text-2xl font-bold text-black">{percentage}%</div>
+              <div className="text-2xl font-bold text-black">{accuracyPercentage}%</div>
               <div className="text-sm text-gray-600">Accuracy</div>
             </div>
           </div>
@@ -250,21 +262,48 @@ function ResultsContent() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="space-y-4"
+          className="space-y-4 mt-8"
         >
           <button
-            onClick={() => router.push('/welcome')}
-            className="btn-rainbow text-xl px-12 py-4 rounded-xl font-bold shadow-lg w-full"
+            onClick={() => {
+              setIsGeneratingScorecard(true);
+              generateScorecard();
+              setTimeout(() => setIsGeneratingScorecard(false), 1000);
+            }}
+            disabled={isGeneratingScorecard}
+            className="btn-rainbow text-xl px-12 py-4 rounded-xl font-bold shadow-lg w-full disabled:opacity-50"
           >
-            🔁 Play Again
+            {isGeneratingScorecard ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="spinner-rainbow w-5 h-5"></div>
+                Generating PNG...
+              </div>
+            ) : (
+              '🎨 Generate PNG Scorecard'
+            )}
           </button>
 
-          <button
-            onClick={() => router.push('/leaderboard')}
-            className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-12 rounded-xl transition-all duration-200 shadow-md w-full"
-          >
-            🏆 View Leaderboard
-          </button>
+          {/* Sharing text */}
+          <p className="text-gray-600 text-sm text-center mb-4">
+            Share your score with friends and challenge them! 🚀
+          </p>
+
+          {/* Two buttons side by side */}
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => router.push('/welcome')}
+              className="bg-purple-600 hover:bg-purple-700 text-white text-lg px-8 py-4 rounded-xl font-bold shadow-lg transition-all duration-200"
+            >
+              🔁 Play Again
+            </button>
+
+            <button
+              onClick={() => router.push('/leaderboard')}
+              className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-8 rounded-xl transition-all duration-200 shadow-md"
+            >
+              🏆 View Leaderboard
+            </button>
+          </div>
 
           <button
             onClick={() => router.push('/')}
@@ -272,33 +311,6 @@ function ResultsContent() {
           >
             ← Back to Home
           </button>
-        </motion.div>
-
-        {/* Social Sharing Section */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-          className="mt-8"
-        >
-          <p className="text-gray-600 mb-4 text-sm">
-            Share your score with friends and challenge them! 🚀
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-3 mb-4">
-            {/* Scorecard Preview */}
-            <button
-              onClick={() => {
-                setIsGeneratingScorecard(true);
-                generateScorecard();
-                setTimeout(() => setIsGeneratingScorecard(false), 1000);
-              }}
-              disabled={isGeneratingScorecard}
-              className="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-            >
-              {isGeneratingScorecard ? '🎨 Generating PNG...' : '🎨 Generate PNG Scorecard'}
-            </button>
-          </div>
         </motion.div>
       </motion.div>
 
@@ -313,70 +325,118 @@ function ResultsContent() {
           fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif"
         }}>
           {/* Header */}
-          <div className="mb-8" style={{ marginBottom: '32px' }}>
-            <h2 className="text-gray-700 text-lg mb-2" style={{
-              color: '#374151',
-              fontSize: '18px',
-              marginBottom: '8px',
-              fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif"
-            }}>{getDisplayName(address, nickname) || 'Quiz Player'}, here is your final score!</h2>
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: 'spring' }}
-              className="text-7xl font-bold text-black mb-4"
-              style={{
-                fontSize: '56px',
-                fontWeight: 'bold',
-                color: '#000000',
-                marginBottom: '16px',
+          <div className="mb-6 flex items-center gap-4" style={{ marginBottom: '24px' }}>
+            {/* PFP Display */}
+            {pfpData && (
+              <div className="flex-shrink-0" style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '50%',
+                  background: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden'
+                }}>
+                  <img
+                    src={pfpData}
+                    alt="Profile Picture"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRadius: '50%'
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div>
+              <h2 className="text-gray-700 text-lg mb-2" style={{
+                color: '#374151',
+                fontSize: '18px',
+                marginBottom: '8px',
                 fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif"
-              }}
-            >
-              {score}
-            </motion.div>
-            <div className="text-2xl font-bold text-purple-600 mb-4" style={{
-              fontSize: '24px',
+              }}>{getDisplayName(address, nickname) || 'Quiz Player'}, here is your final score!</h2>
+            </div>
+          </div>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: 'spring' }}
+            className="text-7xl font-bold text-black mb-4"
+            style={{
+              fontSize: '56px',
               fontWeight: 'bold',
-              color: '#7c3aed',
+              color: '#000000',
               marginBottom: '16px',
               fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif"
-            }}>{rank}</div>
-
-            {/* Progress Bar */}
-            <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden" style={{
-              width: '100%',
-              height: '16px',
-              background: '#e5e7eb',
-              borderRadius: '8px',
-              overflow: 'hidden'
-            }}>
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${percentage}%` }}
-                transition={{ delay: 0.4, duration: 1 }}
-                className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
-                style={{
-                  height: '100%',
-                  background: `linear-gradient(to right, #8b5cf6, #ec4899)`,
-                  borderRadius: '8px',
-                  transition: 'width 1s ease-out'
-                }}
-              />
-            </div>
-            <div className="text-sm text-gray-600 mt-2" style={{
+            }}
+          >
+            {score}
+          </motion.div>
+          {rainbowBonus > 0 && (
+            <div className="text-sm text-purple-600 mb-2 flex items-center justify-center gap-1" style={{
               fontSize: '14px',
-              color: '#6b7280',
-              marginTop: '8px',
+              color: '#7c3aed',
+              marginBottom: '8px',
               fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif"
-            }}>{percentage}% of max score</div>
+            }}>
+              <span>🌈</span>
+              <span>+{rainbowBonus} Rainbow Wallet bonus!</span>
+            </div>
+          )}
+          <div className="text-2xl font-bold text-purple-600 mb-6" style={{
+            fontSize: '24px',
+            fontWeight: 'bold',
+            color: '#7c3aed',
+            marginBottom: '24px',
+            fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif"
+          }}>{rank}</div>
+
+          {/* Progress Bar */}
+          <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden mb-4" style={{
+            width: '100%',
+            height: '16px',
+            background: '#e5e7eb',
+            borderRadius: '8px',
+            overflow: 'hidden',
+            marginBottom: '16px'
+          }}>
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${accuracyPercentage}%` }}
+              transition={{ delay: 0.4, duration: 1 }}
+              className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+              style={{
+                height: '100%',
+                background: `linear-gradient(to right, #8b5cf6, #ec4899)`,
+                borderRadius: '8px',
+                transition: 'width 1s ease-out'
+              }}
+            />
           </div>
+          <div className="text-sm text-gray-600 mb-6" style={{
+            fontSize: '14px',
+            color: '#6b7280',
+            marginBottom: '24px',
+            fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif"
+          }}>{accuracyPercentage}% of questions answered correctly</div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-4" style={{
+          <div className="grid grid-cols-2 gap-6" style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            gap: '16px'
+            gap: '24px'
           }}>
             <div className="bg-white rounded-xl p-4" style={{
               background: '#ffffff',
@@ -416,7 +476,7 @@ function ResultsContent() {
                 fontWeight: 'bold',
                 color: '#000000',
                 fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif"
-              }}>{percentage}%</div>
+              }}>{accuracyPercentage}%</div>
               <div className="text-sm text-gray-600" style={{
                 fontSize: '14px',
                 color: '#6b7280',

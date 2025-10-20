@@ -47,7 +47,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={dmSans.className} suppressHydrationWarning>
         <Providers>
-          <main className="min-h-screen bg-white" suppressHydrationWarning>
+          <main className="min-h-screen" suppressHydrationWarning>
             {children}
           </main>
         </Providers>

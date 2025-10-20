@@ -3,12 +3,22 @@
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getDisplayName, getStoredNickname } from '@/lib/utils/user';
 
 export default function WelcomePage() {
   const { address, isConnected } = useAccount();
   const router = useRouter();
   const [isStarting, setIsStarting] = useState(false);
+  const [nickname, setNickname] = useState('');
+
+  // Load user's nickname
+  useEffect(() => {
+    if (address) {
+      const storedNickname = getStoredNickname(address);
+      setNickname(storedNickname || '');
+    }
+  }, [address]);
 
   const handleStartGame = () => {
     if (!isConnected) {
@@ -40,13 +50,13 @@ export default function WelcomePage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-8"
+          className="mb-8 bg-white rounded-2xl p-8 border border-gray-200"
         >
           <h1 className="text-4xl md:text-5xl font-bold text-black mb-4">
             Ready to Become a <span className="rainbow-text">Rainbownaire</span>?
           </h1>
           <p className="text-lg text-gray-700 mb-2">
-            Connected as: <span className="font-mono text-black">{address?.slice(0, 6)}...{address?.slice(-4)}</span>
+            Connected as: <span className="font-mono text-black">{getDisplayName(address, nickname)}</span>
           </p>
         </motion.div>
 
@@ -55,7 +65,7 @@ export default function WelcomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-gray-50 rounded-2xl p-8 mb-8 border border-gray-200"
+          className="bg-white rounded-2xl p-8 border border-gray-200"
         >
           <h2 className="text-2xl font-bold text-black mb-6">How to Play</h2>
           
@@ -99,6 +109,7 @@ export default function WelcomePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
+          className="mt-8"
         >
           <button
             onClick={handleStartGame}

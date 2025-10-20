@@ -7,6 +7,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getDisplayName, getStoredNickname, storeNickname } from '@/lib/utils/user';
+import { PFPManager } from '@/components/ui/PFPManager';
+import { usePFP } from '@/hooks/usePFP';
 
 export default function HomePage() {
   const { isConnected, address } = useAccount();
@@ -18,6 +20,9 @@ export default function HomePage() {
   const [newNickname, setNewNickname] = useState('');
   const { openAccountModal } = useAccountModal();
   const router = useRouter();
+
+  // PFP management
+  const { pfpData, updatePFP } = usePFP();
 
   // Load nickname from localStorage on mount
   useEffect(() => {
@@ -67,7 +72,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="mb-12"
+          className="mb-12 bg-white rounded-2xl p-8 border border-gray-200"
           suppressHydrationWarning={true}
         >
           <h1 className="text-6xl md:text-8xl font-bold mb-6">
@@ -83,7 +88,7 @@ export default function HomePage() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="bg-gray-50 rounded-3xl p-8 md:p-12 shadow-xl border border-gray-200"
+          className="bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-gray-200"
           suppressHydrationWarning={true}
         >
           <div suppressHydrationWarning={true}>
@@ -113,7 +118,7 @@ export default function HomePage() {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="btn-rainbow px-8 py-4 rounded-xl font-bold shadow-lg"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg transition-all duration-200"
                       disabled={isLoading}
                     >
                       {isLoading ? (
@@ -140,6 +145,7 @@ export default function HomePage() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    onClick={() => disconnect()}
                     className="bg-red-100 hover:bg-red-200 text-red-700 font-bold py-4 px-8 rounded-xl transition-all duration-200 shadow-lg"
                   >
                     Disconnect
@@ -174,6 +180,16 @@ export default function HomePage() {
                         ✏️
                       </button>
                     )}
+                  </div>
+
+                  {/* PFP Manager */}
+                  <div className="mt-6 flex justify-center">
+                    <PFPManager
+                      currentPFP={pfpData}
+                      onPFPChange={updatePFP}
+                      size="md"
+                      showRemove={true}
+                    />
                   </div>
                 </div>
 
@@ -229,19 +245,19 @@ export default function HomePage() {
           className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8"
           suppressHydrationWarning={true}
         >
-          <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200" suppressHydrationWarning={true}>
+          <div className="bg-white rounded-2xl p-6 border border-gray-200" suppressHydrationWarning={true}>
             <div className="text-4xl mb-4" suppressHydrationWarning={true}>🧠</div>
             <h3 className="text-xl font-bold mb-2 text-black">AI-Powered Questions</h3>
             <p className="text-gray-700">Fresh, randomized questions generated specifically for the Rainbow community.</p>
           </div>
 
-          <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200" suppressHydrationWarning={true}>
+          <div className="bg-white rounded-2xl p-6 border border-gray-200" suppressHydrationWarning={true}>
             <div className="text-4xl mb-4" suppressHydrationWarning={true}>🦄</div>
             <h3 className="text-xl font-bold mb-2 text-black">Wallet Login</h3>
             <p className="text-gray-700">Your Rainbow Wallet is your identity. No traditional signups required!</p>
           </div>
 
-          <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200" suppressHydrationWarning={true}>
+          <div className="bg-white rounded-2xl p-6 border border-gray-200" suppressHydrationWarning={true}>
             <div className="text-4xl mb-4" suppressHydrationWarning={true}>🏆</div>
             <h3 className="text-xl font-bold mb-2 text-black">Global Leaderboard</h3>
             <p className="text-gray-700">Compete with the Rainbow community and track your Rainbownaire score!</p>
@@ -256,7 +272,27 @@ export default function HomePage() {
           className="mt-16 text-gray-500 text-sm"
           suppressHydrationWarning={true}
         >
-          <p>Built with ❤️ for the Rainbow Wallet community</p>
+          <p>
+            Made with ❤️ by{' '}
+            <a
+              href="https://x.com/jigz_crypto"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-purple-600 hover:text-purple-800 underline font-medium"
+            >
+              Jigz
+            </a>
+            {' '} & {' '}
+            <a
+              href="https://x.com/davee0x"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-purple-600 hover:text-purple-800 underline font-medium"
+            >
+              Dave
+            </a>
+            {' '}for the Rainbow Community
+          </p>
         </motion.div>
       </div>
     </div>

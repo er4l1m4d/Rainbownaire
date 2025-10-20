@@ -7,17 +7,36 @@ import { motion } from 'framer-motion';
 import { QuestionCard } from '@/components/game/QuestionCard';
 import { Timer } from '@/components/game/Timer';
 import { LifelineButtons } from '@/components/game/LifelineButtons';
-import { sampleQuestions } from '@/lib/data/sampleQuestions';
+import { sampleQuestions, getRandomQuestions } from '@/lib/data/sampleQuestions';
 import { Question, LifelinesUsed, LifelineType } from '@/types/game';
 import { LifelineManager } from '@/lib/utils/lifelineLogic';
 import { calculateQuestionScore } from '@/lib/utils/scoring';
+import { usePFP } from '@/hooks/usePFP';
+import { shuffleArray } from '@/lib/utils/user';
+import Image from 'next/image';
 
 export default function QuizPage() {
   const router = useRouter();
-  const { isConnected } = useAccount();
-  
+  const { isConnected, connector } = useAccount();
+
+  // PFP management
+  const { pfpData } = usePFP();
+
+  // Rainbow Wallet detection and bonus
+  const [isRainbowWallet, setIsRainbowWallet] = useState(false);
+  const [rainbowBonus, setRainbowBonus] = useState(0);
+
+  // Detect Rainbow Wallet on mount and connection changes
+  useEffect(() => {
+    if (connector) {
+      const isRainbow = connector.id === 'rainbow' || connector.name?.toLowerCase().includes('rainbow');
+      setIsRainbowWallet(isRainbow);
+    }
+  }, [connector]);
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [lifelinesUsed, setLifelinesUsed] = useState<LifelinesUsed>({});
   const [hiddenOptions, setHiddenOptions] = useState<string[]>([]);
@@ -30,19 +49,85 @@ export default function QuizPage() {
   const [isAnswered, setIsAnswered] = useState(false);
   const [pointsEarned, setPointsEarned] = useState(0);
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
-  
-  const currentQuestion = sampleQuestions?.[currentQuestionIndex];
-  const isLastQuestion = currentQuestionIndex === sampleQuestions.length - 1;
+
+  // Shuffled questions state
+  const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
+
+  // Initialize shuffled questions when component mounts
+  useEffect(() => {
+    // Get 15 random questions from the full question pool
+    const randomQuestions = getRandomQuestions(15);
+
+    if (randomQuestions && randomQuestions.length > 0) {
+      // Shuffle questions order
+      const shuffled = shuffleArray(randomQuestions);
+
+      // Shuffle answer options within each question while keeping letters in order
+      const shuffledWithOptions = shuffled.map(question => {
+        // Extract the content part of each answer option
+        const answerContents = question.answer_options.map(option => {
+          // Match pattern like "A) Answer content" and extract "Answer content"
+          const match = option.match(/^[A-D]\)\s*(.+)$/);
+          return match ? match[1] : option;
+        });
+
+        // Shuffle the content
+        const shuffledContents = shuffleArray(answerContents);
+
+        // Find which content is the correct answer
+        const correctAnswerContent = question.answer_options.find(option => {
+          const match = option.match(/^[A-D]\)\s*(.+)$/);
+          if (match) {
+            // Check if this option's letter matches the correct answer
+            const letter = option.charAt(0);
+            return letter === question.correct_answer;
+          }
+          return false;
+        });
+
+        // Extract the correct answer content
+        let correctContent = '';
+        if (correctAnswerContent) {
+          const match = correctAnswerContent.match(/^[A-D]\)\s*(.+)$/);
+          if (match) {
+            correctContent = match[1];
+          }
+        }
+
+        // Find where the correct answer content ended up in the shuffled array
+        const newCorrectIndex = shuffledContents.indexOf(correctContent);
+        const letterOptions = ['A', 'B', 'C', 'D'];
+        const newCorrectAnswer = letterOptions[newCorrectIndex] as 'A' | 'B' | 'C' | 'D';
+
+        // Create new options with letters in order but shuffled content
+        const shuffledOptions = ['A', 'B', 'C', 'D'].map((letter, index) =>
+          `${letter}) ${shuffledContents[index]}`
+        );
+
+        return {
+          ...question,
+          answer_options: shuffledOptions,
+          correct_answer: newCorrectAnswer
+        };
+      });
+
+      setShuffledQuestions(shuffledWithOptions);
+      setIsLoading(false);
+    }
+  }, []);
+
+  const currentQuestion = shuffledQuestions?.[currentQuestionIndex];
+  const isLastQuestion = currentQuestionIndex === shuffledQuestions.length - 1;
   const lifelineManager = new LifelineManager(lifelinesUsed);
   
   // Set loading state when questions change
   useEffect(() => {
-    if (sampleQuestions && sampleQuestions.length > 0) {
+    if (shuffledQuestions && shuffledQuestions.length > 0) {
       setIsLoading(false);
     } else {
       setIsLoading(true);
     }
-  }, [sampleQuestions]);
+  }, [shuffledQuestions]);
 
   // Redirect if not connected
   useEffect(() => {
@@ -78,18 +163,29 @@ export default function QuizPage() {
       lifelinesUsed
     );
 
-    const newScore = Math.max(0, score + scoreCalc.totalScore);
+    // Apply Rainbow Wallet bonus if applicable
+    const bonusMultiplier = isRainbowWallet ? 1.15 : 1.0;
+    const bonusAmount = Math.floor(scoreCalc.totalScore * (bonusMultiplier - 1));
+    const finalScore = Math.floor(scoreCalc.totalScore * bonusMultiplier);
+
+    const newScore = Math.max(0, score + finalScore);
     setScore(newScore);
 
-    // Update streak
+    // Track Rainbow Wallet bonus for display
+    if (isRainbowWallet && bonusAmount > 0) {
+      setRainbowBonus(prev => prev + bonusAmount);
+    }
+
+    // Track correct answers
     if (isCorrect) {
+      setCorrectAnswers(prev => prev + 1);
       setConsecutiveCorrect(prev => prev + 1);
     } else {
       setConsecutiveCorrect(0);
     }
 
     // Show points popup
-    setPointsEarned(scoreCalc.totalScore);
+    setPointsEarned(finalScore);
     setIsCorrectAnswer(isCorrect);
     setShowPointsPopup(true);
   };
@@ -116,6 +212,7 @@ export default function QuizPage() {
     setFriendAdvice(null);
     setIsAnswered(false);
     setQuestionStartTime(Date.now());
+    setRainbowBonus(0); // Reset bonus for next question
   };
 
   const handleContinueToNext = () => {
@@ -124,7 +221,7 @@ export default function QuizPage() {
     // Move to next question after showing popup
     setTimeout(() => {
       if (isLastQuestion) {
-        router.push(`/results?score=${score}`);
+        router.push(`/results?score=${score}&correct=${correctAnswers}`);
       } else {
         nextQuestion();
       }
@@ -186,20 +283,37 @@ export default function QuizPage() {
   }
 
   return (
-    <div className="min-h-screen p-4 py-8" suppressHydrationWarning={true}>
+    <div className="min-h-screen flex items-center justify-center p-4 py-8" suppressHydrationWarning={true}>
       <div className="max-w-5xl mx-auto" suppressHydrationWarning={true}>
         {/* Header */}
-        <div className="mb-8" suppressHydrationWarning={true}>
+        <div className="mb-8 bg-white rounded-2xl p-8 border border-gray-200" suppressHydrationWarning={true}>
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+            {/* PFP Display */}
+            {pfpData && (
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 rounded-full">
+                  <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
+                    <Image
+                      src={pfpData}
+                      alt="Profile Picture"
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Progress */}
             <div className="text-center md:text-left">
               <h1 className="text-2xl font-bold text-black mb-2">
-                Question {currentQuestionIndex + 1} / {sampleQuestions.length}
+                Question {currentQuestionIndex + 1} / {shuffledQuestions.length}
               </h1>
               <div className="w-full md:w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: `${((currentQuestionIndex + 1) / sampleQuestions.length) * 100}%` }}
+                  animate={{ width: `${((currentQuestionIndex + 1) / shuffledQuestions.length) * 100}%` }}
                   className="h-full progress-rainbow"
                 />
               </div>
@@ -217,6 +331,12 @@ export default function QuizPage() {
             <div className="score-display">
               <div className="text-sm">Score</div>
               <div className="text-2xl font-bold">{score}</div>
+              {isRainbowWallet && (
+                <div className="text-xs text-purple-600 flex items-center gap-1 mt-1">
+                  <span>🌈</span>
+                  <span>+15%</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -295,8 +415,13 @@ export default function QuizPage() {
                 <div className={`text-5xl font-bold mb-3 ${pointsEarned > 0 ? 'text-green-500' : 'text-gray-500'}`}>
                   {pointsEarned > 0 ? '+' : ''}{pointsEarned} pts
                 </div>
+                {isRainbowWallet && rainbowBonus > 0 && (
+                  <div className="text-sm text-purple-600 mb-2">
+                    🌈 +{rainbowBonus} Rainbow Wallet bonus!
+                  </div>
+                )}
                 <div className="text-gray-600 text-sm mb-6">
-                  {pointsEarned === 0 && !isCorrectAnswer ? 'Question skipped' : `Question ${currentQuestionIndex + 1} of ${sampleQuestions.length}`}
+                  {pointsEarned === 0 && !isCorrectAnswer ? 'Question skipped' : `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`}
                 </div>
                 
                 <button

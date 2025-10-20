@@ -60,38 +60,6 @@ export function Timer({
           {timeLeft}s
         </motion.span>
       </div>
-
-      {/* Progress Ring */}
-      <div className="relative w-16 h-16">
-        <svg className="transform -rotate-90 w-16 h-16">
-          {/* Background circle */}
-          <circle
-            cx="32"
-            cy="32"
-            r="28"
-            stroke="#e5e7eb"
-            strokeWidth="6"
-            fill="none"
-          />
-          {/* Progress circle */}
-          <motion.circle
-            cx="32"
-            cy="32"
-            r="28"
-            stroke={isWarning ? '#ef4444' : '#667eea'}
-            strokeWidth="6"
-            fill="none"
-            strokeDasharray={`${2 * Math.PI * 28}`}
-            strokeDashoffset={`${2 * Math.PI * 28 * (1 - timeLeft / initialTime)}`}
-            strokeLinecap="round"
-            initial={{ strokeDashoffset: 0 }}
-            animate={{ 
-              strokeDashoffset: `${2 * Math.PI * 28 * (1 - timeLeft / initialTime)}` 
-            }}
-            transition={{ duration: 0.3 }}
-          />
-        </svg>
-      </div>
     </div>
   );
 }
