@@ -69,6 +69,8 @@ function ResultsContent() {
   }, [address]);
 
   const handleShare = async () => {
+    if (typeof window === 'undefined') return;
+
     const shareUrl = `${window.location.origin}/results?score=${score}`;
     const shareText = `I just scored ${score} points in Rainbownaire quiz! 🌈 Can you beat my score? ${rank}`;
     try {
@@ -90,6 +92,8 @@ function ResultsContent() {
   };
 
   const handleCopyLink = async () => {
+    if (typeof window === 'undefined') return;
+
     const shareUrl = `${window.location.origin}/results?score=${score}`;
     try {
       await navigator.clipboard.writeText(shareUrl);
@@ -101,13 +105,15 @@ function ResultsContent() {
   };
 
   const handleTwitterShare = () => {
+    if (typeof window === 'undefined') return;
+
     const shareUrl = `${window.location.origin}/results?score=${score}`;
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareUrl)}`;
     window.open(url, '_blank', 'width=600,height=400');
   };
 
   const generateScorecard = async () => {
-    if (isGeneratingScorecard) return;
+    if (isGeneratingScorecard || typeof window === 'undefined' || typeof document === 'undefined') return;
 
     try {
       setIsGeneratingScorecard(true);
@@ -140,24 +146,25 @@ function ResultsContent() {
   };
 
   const downloadScorecard = () => {
-    if (scorecardImageUrl) {
-      // Download the PNG image
-      const displayName = getDisplayName(address, nickname) || 'Quiz Player';
-      const link = document.createElement('a');
-      link.download = `rainbownaire-scorecard-${displayName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.png`;
-      link.href = scorecardImageUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
+    if (!scorecardImageUrl || typeof window === 'undefined' || typeof document === 'undefined') {
       // Fallback to copying share URL
       handleCopyLink();
       alert('PNG not ready yet. Share link copied instead! 📋');
+      return;
     }
+
+    // Download the PNG image
+    const displayName = getDisplayName(address, nickname) || 'Quiz Player';
+    const link = document.createElement('a');
+    link.download = `rainbownaire-scorecard-${displayName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.png`;
+    link.href = scorecardImageUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const copyImageToClipboard = async () => {
-    if (!scorecardImageUrl) return;
+    if (!scorecardImageUrl || typeof window === 'undefined' || typeof navigator === 'undefined') return;
 
     try {
       // Fetch the image and convert to blob
