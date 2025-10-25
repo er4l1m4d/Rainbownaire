@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createSupabaseServerClient();
 
     // Test the connection by checking if we can access the leaderboard_entries table
-    const { data: testData, error: testError } = await supabase
+    const { data: testData, error: testError } = await (supabase as any)
       .from('leaderboard_entries')
       .select('id')
       .limit(1);
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build the query based on time filter
-    let query = supabase
+    let query = (supabase as any)
       .from('leaderboard_entries')
       .select(`
         id,
@@ -123,12 +123,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if Supabase environment variables are set
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      console.error('Missing Supabase environment variables');
+      return NextResponse.json(
+        { error: 'Database configuration missing' },
+        { status: 500 }
+      );
+    }
+
     const supabase = await createSupabaseServerClient();
 
     // If this is just a nickname update (not a score submission)
     if (updateOnly && displayName) {
       // First, ensure the player exists in the database
-      let { data: player, error: playerError } = await supabase
+      let { data: player, error: playerError } = await (supabase as any)
         .from('players')
         .select('id')
         .eq('wallet_address', playerAddress)
@@ -144,7 +153,7 @@ export async function POST(request: NextRequest) {
 
       // If player doesn't exist, create them (without updating stats)
       if (!player) {
-        const { data: newPlayer, error: createPlayerError } = await supabase
+        const { data: newPlayer, error: createPlayerError } = await (supabase as any)
           .from('players')
           .insert({
             wallet_address: playerAddress,
@@ -166,15 +175,15 @@ export async function POST(request: NextRequest) {
         }
 
         player = newPlayer;
-      } else {
+      } else if (player) {
         // Update player's display name and last active time
-        const { error: updatePlayerError } = await supabase
+        const { error: updatePlayerError } = await (supabase as any)
           .from('players')
           .update({
             display_name: displayName.trim(),
             last_active: new Date().toISOString(),
           })
-          .eq('id', player.id);
+          .eq('id', player!.id);
 
         if (updatePlayerError) {
           console.error('Error updating player:', updatePlayerError);
@@ -188,7 +197,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         data: {
-          playerId: player.id,
+          playerId: player!.id,
           displayName: displayName.trim(),
         },
       });
@@ -203,7 +212,7 @@ export async function POST(request: NextRequest) {
     }
 
     // First, ensure the player exists in the database
-    let { data: player, error: playerError } = await supabase
+    let { data: player, error: playerError } = await (supabase as any)
       .from('players')
       .select('id')
       .eq('wallet_address', playerAddress)
@@ -219,7 +228,7 @@ export async function POST(request: NextRequest) {
 
     // If player doesn't exist, create them
     if (!player) {
-      const { data: newPlayer, error: createPlayerError } = await supabase
+      const { data: newPlayer, error: createPlayerError } = await (supabase as any)
         .from('players')
         .insert({
           wallet_address: playerAddress,
@@ -241,7 +250,7 @@ export async function POST(request: NextRequest) {
       }
 
       player = newPlayer;
-    } else {
+    } else if (player) {
       // Update player's total games and points, and display name if provided
       const updateData: any = {
         total_games_played: (player.total_games_played || 0) + 1,
@@ -254,10 +263,10 @@ export async function POST(request: NextRequest) {
         updateData.display_name = displayName.trim();
       }
 
-      const { error: updatePlayerError } = await supabase
+      const { error: updatePlayerError } = await (supabase as any)
         .from('players')
         .update(updateData)
-        .eq('id', player.id);
+        .eq('id', player!.id);
 
       if (updatePlayerError) {
         console.error('Error updating player:', updatePlayerError);
@@ -269,10 +278,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Create a quiz session to track this game
-    const { data: session, error: sessionError } = await supabase
+    const { data: session, error: sessionError } = await (supabase as any)
       .from('quiz_sessions')
       .insert({
-        player_id: player.id,
+        player_id: player!.id,
         score: score,
         is_active: false,
         completed: true,
@@ -292,10 +301,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Create leaderboard entry
-    const { data: leaderboardEntry, error: leaderboardError } = await supabase
+    const { data: leaderboardEntry, error: leaderboardError } = await (supabase as any)
       .from('leaderboard_entries')
       .insert({
-        player_id: player.id,
+        player_id: player!.id,
         score: score,
         session_id: session.id,
         achieved_at: new Date().toISOString(),
@@ -315,7 +324,7 @@ export async function POST(request: NextRequest) {
       success: true,
       data: {
         entryId: leaderboardEntry.id,
-        playerId: player.id,
+        playerId: player!.id,
         score: score,
       },
     });
