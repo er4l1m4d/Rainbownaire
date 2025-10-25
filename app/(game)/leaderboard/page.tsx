@@ -46,7 +46,23 @@ export default function LeaderboardPage() {
       }
     } catch (err) {
       console.error('Error fetching leaderboard:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load leaderboard');
+      let errorMessage = 'Failed to load leaderboard';
+
+      if (err instanceof Error) {
+        if (err.message.includes('Database configuration missing')) {
+          errorMessage = 'Database not configured. Please check environment variables.';
+        } else if (err.message.includes('Database connection failed')) {
+          errorMessage = 'Cannot connect to database. Please check your Supabase configuration.';
+        } else if (err.message.includes('Players table not accessible')) {
+          errorMessage = 'Database tables not set up. Please run the database setup script.';
+        } else if (err.message.includes('Failed to fetch')) {
+          errorMessage = 'No scores submitted yet. Be the first to play!';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -137,12 +153,94 @@ export default function LeaderboardPage() {
               <h3 className="text-lg font-bold text-red-800 mb-2">Error Loading Leaderboard</h3>
               <p className="text-red-600 text-sm mb-4">{error}</p>
               <div className="text-xs text-gray-500 mb-4">
-                This might be due to:
-                <ul className="list-disc list-inside mt-2 text-left">
-                  <li>Missing database configuration</li>
-                  <li>Network connectivity issues</li>
-                  <li>No quiz scores submitted yet</li>
-                </ul>
+                {error.includes('Database not configured') && (
+                  <div className="text-left">
+                    <p className="font-medium mb-2">To fix this:</p>
+                    <ol className="list-decimal list-inside space-y-1">
+                      <li>Go to your Vercel dashboard</li>
+                      <li>Navigate to Project Settings → Environment Variables</li>
+                      <li>Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY</li>
+                      <li>Redeploy your project</li>
+                    </ol>
+                  </div>
+                )}
+                {error.includes('Database tables not set up') && (
+                  <div className="text-left">
+                    <p className="font-medium mb-2">To fix this:</p>
+                    <ol className="list-decimal list-inside space-y-1">
+                      <li>Go to your Supabase dashboard</li>
+                      <li>Navigate to SQL Editor</li>
+                      <li>Copy the SQL from setup_database_minimal.sql</li>
+                      <li>Run the SQL to create the required tables</li>
+                    </ol>
+                  </div>
+                )}
+                {error.includes('No scores submitted yet') && (
+                  <div className="text-left">
+                    <p className="font-medium mb-2">To get started:</p>
+                    <ol className="list-decimal list-inside space-y-1">
+                      <li>Complete a full quiz (15 questions)</li>
+                      <li>Your score will be automatically submitted</li>
+                      <li>Check back here to see your ranking!</li>
+                    </ol>
+                  </div>
+                )}
+              <div className="text-xs text-gray-500 mb-4">
+                {error.includes('Database not configured') && (
+                  <div className="text-left">
+                    <p className="font-medium mb-2">To fix this:</p>
+                    <ol className="list-decimal list-inside space-y-1">
+                      <li>Go to your Vercel dashboard</li>
+                      <li>Navigate to Project Settings → Environment Variables</li>
+                      <li>Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY</li>
+                      <li>Redeploy your project</li>
+                    </ol>
+                  </div>
+                )}
+                {error.includes('Database tables not set up') && (
+                  <div className="text-left">
+                    <p className="font-medium mb-2">To fix this:</p>
+                    <ol className="list-decimal list-inside space-y-1">
+                      <li>Go to your Supabase dashboard</li>
+                      <li>Navigate to SQL Editor</li>
+                      <li>Copy the SQL from setup_database_minimal.sql</li>
+                      <li>Run the SQL to create the required tables</li>
+                    </ol>
+                  </div>
+                )}
+                {error.includes('No scores submitted yet') && (
+                  <div className="text-left">
+                    <p className="font-medium mb-2">To get started:</p>
+                    <ol className="list-decimal list-inside space-y-1">
+                      <li>Complete a full quiz (15 questions)</li>
+                      <li>Your score will be automatically submitted</li>
+                      <li>Check back here to see your ranking!</li>
+                    </ol>
+                  </div>
+                )}
+                {error.includes('Cannot connect to database') && (
+                  <div className="text-left">
+                    <p className="font-medium mb-2">To fix this:</p>
+                    <ol className="list-decimal list-inside space-y-1">
+                      <li>Verify your Supabase credentials are correct</li>
+                      <li>Check that your Supabase project is active</li>
+                      <li>Ensure the API keys have the right permissions</li>
+                      <li>Try redeploying your project</li>
+                    </ol>
+                  </div>
+                )}
+                {!error.includes('No scores submitted yet') && (
+                  <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
+                    <p className="font-medium mb-1">🔧 Debug:</p>
+                    <a
+                      href="/api/health"
+                      target="_blank"
+                      className="text-blue-600 hover:underline"
+                    >
+                      Check database health →
+                    </a>
+                  </div>
+                )}
               </div>
               <button
                 onClick={() => fetchLeaderboardData(timeFilter)}

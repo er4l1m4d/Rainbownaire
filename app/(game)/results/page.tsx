@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getDisplayName, getStoredNickname } from '@/lib/utils/user';
 import { sampleQuestions } from '@/lib/data/sampleQuestions';
 import html2canvas from 'html2canvas';
-import { usePFP } from '@/hooks/usePFP';
 import Image from 'next/image';
 
 // Helper function to determine score rank
@@ -28,8 +27,8 @@ function ResultsContent() {
   const searchParams = useSearchParams();
   const { isConnected, address } = useAccount();
 
-  // PFP management
-  const { pfpData } = usePFP();
+  // PFP management - using local state instead of hook
+  const [pfpData, setPfpData] = useState<string | null>(null);
 
   const score = parseInt(searchParams.get('score') || '0');
   const correctAnswers = parseInt(searchParams.get('correct') || '0');
@@ -45,19 +44,13 @@ function ResultsContent() {
   // Tweet text for social sharing
   const tweetText = `I just scored ${score} points in Rainbownaire quiz! 🌈 ${rank} Can you beat my score?`;
 
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [isGeneratingScorecard, setIsGeneratingScorecard] = useState(false);
-  const [showScorecardPreview, setShowScorecardPreview] = useState(false);
+  const [isDappBrowser, setIsDappBrowser] = useState(false);
+  const [browserType, setBrowserType] = useState<string>('');
   const [scorecardImageUrl, setScorecardImageUrl] = useState<string>('');
+  const [showScorecardPreview, setShowScorecardPreview] = useState(false);
+  const [isGeneratingScorecard, setIsGeneratingScorecard] = useState(false);
   const [nickname, setNickname] = useState<string>('');
-
-  useEffect(() => {
-    if (!isConnected) {
-      router.push('/');
-    } else {
-      setShowConfetti(true);
-    }
-  }, [isConnected, router]);
+  const [pfpData, setPfpData] = useState<string | null>(null);
 
   // Load user's nickname
   useEffect(() => {
@@ -71,8 +64,10 @@ function ResultsContent() {
     if (typeof window === 'undefined') return;
 
     const shareUrl = `${window.location.origin}/results?score=${score}`;
-    const shareText = `I just scored ${score} points in Rainbownaire quiz! 🌈 Can you beat my score? ${rank}`;
+    const shareText = `I just scored ${score} points in Rainbownaire quiz! 🌈 ${rank} Can you beat my score?`;
+
     try {
+      // Try Web Share API first (mobile browsers)
       if (navigator.share) {
         await navigator.share({
           title: 'My Rainbownaire Score!',
@@ -86,7 +81,13 @@ function ResultsContent() {
       }
     } catch (err) {
       console.error('Failed to share:', err);
-      alert('Failed to share. Please try again! 📋');
+      // Final fallback: copy link
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        alert('Link copied to clipboard! 📋');
+      } catch (clipboardErr) {
+        alert('Failed to share. Please copy the URL manually! 📋');
+      }
     }
   };
 
@@ -100,6 +101,46 @@ function ResultsContent() {
     } catch (err) {
       console.error('Failed to copy:', err);
       alert('Failed to copy link. Please try again! 📋');
+    }
+  };
+
+  const copyImageToClipboard = async () => {
+    if (!scorecardImageUrl || typeof window === 'undefined' || typeof navigator === 'undefined') return;
+
+    try {
+      // For dApp browsers, provide alternative instructions
+      if (isDappBrowser) {
+        // Try basic clipboard first
+        await navigator.clipboard.writeText(scorecardImageUrl);
+        alert(`Image data copied! In ${browserType}, try: 1) Long-press the image 2) Select "Share" or "Save Image" 📱`);
+        return;
+      }
+
+      // Fetch the image and convert to blob
+      const response = await fetch(scorecardImageUrl);
+      const blob = await response.blob();
+
+      // Try modern ClipboardItem API first
+      if (navigator.clipboard && window.ClipboardItem) {
+        try {
+          const clipboardItem = new ClipboardItem({ 'image/png': blob });
+          await navigator.clipboard.write([clipboardItem]);
+          alert('Image copied to clipboard! You can now paste it anywhere. 🖼️');
+          return;
+        } catch (clipboardError) {
+          console.warn('ClipboardItem failed, falling back to text:', clipboardError);
+        }
+      }
+
+      // Fallback: copy the data URL as text (user can paste into image editors)
+      await navigator.clipboard.writeText(scorecardImageUrl);
+      alert('Image data copied! You can paste this into image editing apps. 🖼️');
+
+    } catch (err) {
+      console.error('Failed to copy image:', err);
+      // Final fallback: copy share link
+      handleCopyLink();
+      alert('Copy not supported. Link copied instead! 📋');
     }
   };
 
@@ -123,22 +164,48 @@ function ResultsContent() {
         throw new Error('Scorecard preview element not found');
       }
 
-      const canvas = await html2canvas(element, {
+      // Enhanced html2canvas options for better dApp browser compatibility
+      const canvasOptions = {
         background: '#ffffff',
         useCORS: true,
-        allowTaint: false,
+        allowTaint: true, // Allow cross-origin images
         logging: false,
         width: 800,
         height: element.scrollHeight,
-      });
+        scale: 2, // Higher resolution for better quality
+        // Remove animations for screenshot
+        ignoreElements: (element: Element) => {
+          return element.classList.contains('spinner-rainbow') ||
+                 element.tagName === 'BUTTON' ||
+                 element.getAttribute('data-html2canvas-ignore') === 'true';
+        }
+      };
 
+      // For dApp browsers, use simplified options
+      const finalOptions = isDappBrowser ? {
+        ...canvasOptions,
+        allowTaint: true,
+        useCORS: false, // Disable CORS for dApp browsers
+        scale: 1, // Lower scale for better performance
+      } : canvasOptions;
+
+      const canvas = await html2canvas(element, finalOptions);
       const imageUrl = canvas.toDataURL('image/png');
       setScorecardImageUrl(imageUrl);
       setShowScorecardPreview(true);
 
     } catch (error) {
       console.error('Error generating scorecard:', error);
-      alert(`Failed to generate scorecard: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again! 📋`);
+
+      // Provide specific error messages for dApp browsers
+      let errorMessage = 'Failed to generate scorecard';
+      if (isDappBrowser) {
+        errorMessage = `${browserType} browser has limited image generation support. Try using Chrome or Safari instead.`;
+      } else {
+        errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      }
+
+      alert(`${errorMessage}. Please try sharing the link instead! 📋`);
     } finally {
       setIsGeneratingScorecard(false);
     }
@@ -152,37 +219,52 @@ function ResultsContent() {
       return;
     }
 
-    // Download the PNG image
-    const displayName = getDisplayName(address, nickname) || 'Quiz Player';
-    const link = document.createElement('a');
-    link.download = `rainbownaire-scorecard-${displayName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.png`;
-    link.href = scorecardImageUrl;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      // For dApp browsers, use alternative download methods
+      if (isDappBrowser) {
+        // Try to open image in new tab first
+        const newWindow = window.open(scorecardImageUrl, '_blank');
+        if (newWindow) {
+          alert(`Image opened in new tab! ${isDappBrowser ? 'Long-press to save or share the image.' : 'Right-click to save.'}`);
+          return;
+        }
+      }
+
+      // Standard download for regular browsers
+      const displayName = getDisplayName(address, nickname) || 'Quiz Player';
+      const link = document.createElement('a');
+      link.download = `rainbownaire-scorecard-${displayName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.png`;
+      link.href = scorecardImageUrl;
+      link.target = '_blank'; // Open in new tab as fallback
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+    } catch (error) {
+      console.error('Download failed:', error);
+      // Fallback to copying the image URL
+      handleCopyLink();
+      alert('Download not supported in this browser. Link copied instead! 📋');
+    }
   };
 
-  const copyImageToClipboard = async () => {
-    if (!scorecardImageUrl || typeof window === 'undefined' || typeof navigator === 'undefined') return;
+  const handleWebShare = async () => {
+    if (typeof window === 'undefined' || !navigator.share) {
+      // Fallback to copying link
+      handleCopyLink();
+      return;
+    }
 
     try {
-      // Fetch the image and convert to blob
-      const response = await fetch(scorecardImageUrl);
-      const blob = await response.blob();
-
-      // Try to use the ClipboardItem API if available (Chrome/Edge)
-      if (navigator.clipboard && window.ClipboardItem) {
-        const clipboardItem = new ClipboardItem({ 'image/png': blob });
-        await navigator.clipboard.write([clipboardItem]);
-        alert('Image copied to clipboard! You can now paste it anywhere. 🖼️');
-      } else {
-        // Fallback: copy the data URL as text
-        await navigator.clipboard.writeText(scorecardImageUrl);
-        alert('Image data copied! You can paste this into image editing apps. 🖼️');
-      }
-    } catch (err) {
-      console.error('Failed to copy image:', err);
-      alert('Failed to copy image. Please download it instead. 🖼️');
+      const shareUrl = `${window.location.origin}/results?score=${score}`;
+      await navigator.share({
+        title: 'My Rainbownaire Score!',
+        text: tweetText,
+        url: shareUrl,
+      });
+    } catch (error) {
+      console.error('Web Share failed:', error);
+      handleCopyLink();
     }
   };
 
@@ -247,6 +329,21 @@ function ResultsContent() {
             <div className="text-xs sm:text-sm text-gray-600 mt-2">{accuracyPercentage}% of questions answered correctly</div>
           </div>
 
+          {/* dApp Browser Warning */}
+          {isDappBrowser && (
+            <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-xl">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-orange-600">📱</span>
+                <span className="text-orange-700 font-medium text-sm">
+                  Using {browserType} - Limited Features
+                </span>
+              </div>
+              <p className="text-orange-600 text-xs">
+                PNG generation and clipboard may not work. Try: 1) Long-press images to save 2) Use "Share/Mobile Options" button 3) Copy the link and share manually
+              </p>
+            </div>
+          )}
+
           {/* Stats */}
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <div className="bg-white rounded-xl p-3 sm:p-4">
@@ -254,7 +351,7 @@ function ResultsContent() {
               <div className="text-lg sm:text-xl md:text-2xl font-bold text-black">{totalQuestions}</div>
               <div className="text-xs sm:text-sm text-gray-600">Questions</div>
             </div>
-            
+
             <div className="bg-white rounded-xl p-3 sm:p-4">
               <div className="text-2xl sm:text-3xl mb-2">💯</div>
               <div className="text-lg sm:text-xl md:text-2xl font-bold text-black">{accuracyPercentage}%</div>
@@ -562,7 +659,7 @@ function ResultsContent() {
                         onClick={handleShare}
                         className="bg-gray-800 hover:bg-gray-900 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                       >
-                        📱 Share Link
+                        📱 {isDappBrowser ? 'Share/Mobile Options' : 'Share Link'}
                       </button>
 
                       <button
@@ -612,7 +709,7 @@ function ResultsContent() {
                         onClick={handleShare}
                         className="bg-gray-800 hover:bg-gray-900 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                       >
-                        📱 Share Link
+                        📱 {isDappBrowser ? 'Share/Mobile Options' : 'Share Link'}
                       </button>
 
                       <button

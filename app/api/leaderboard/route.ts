@@ -32,6 +32,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Check if we can access the players table
+    const { data: playerTest, error: playerTestError } = await (supabase as any)
+      .from('players')
+      .select('id')
+      .limit(1);
+
+    if (playerTestError) {
+      console.error('Players table access failed:', playerTestError);
+      return NextResponse.json(
+        { error: `Players table not accessible: ${playerTestError.message}` },
+        { status: 500 }
+      );
+    }
+
     // Build the query based on time filter
     let query = (supabase as any)
       .from('leaderboard_entries')
