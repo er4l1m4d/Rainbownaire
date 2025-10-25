@@ -22,18 +22,6 @@ export default function QuizPage() {
   // PFP management
   const { pfpData } = usePFP();
 
-  // Rainbow Wallet detection and bonus
-  const [isRainbowWallet, setIsRainbowWallet] = useState(false);
-  const [rainbowBonus, setRainbowBonus] = useState(0);
-
-  // Detect Rainbow Wallet on mount and connection changes
-  useEffect(() => {
-    if (connector) {
-      const isRainbow = connector.id === 'rainbow' || connector.name?.toLowerCase().includes('rainbow');
-      setIsRainbowWallet(isRainbow);
-    }
-  }, [connector]);
-
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
@@ -163,18 +151,9 @@ export default function QuizPage() {
       lifelinesUsed
     );
 
-    // Apply Rainbow Wallet bonus if applicable
-    const bonusMultiplier = isRainbowWallet ? 1.15 : 1.0;
-    const bonusAmount = Math.floor(scoreCalc.totalScore * (bonusMultiplier - 1));
-    const finalScore = Math.floor(scoreCalc.totalScore * bonusMultiplier);
-
-    const newScore = Math.max(0, score + finalScore);
+    const newScore = Math.max(0, score + scoreCalc.totalScore);
     setScore(newScore);
 
-    // Track Rainbow Wallet bonus for display
-    if (isRainbowWallet && bonusAmount > 0) {
-      setRainbowBonus(prev => prev + bonusAmount);
-    }
 
     // Track correct answers
     if (isCorrect) {
@@ -185,7 +164,7 @@ export default function QuizPage() {
     }
 
     // Show points popup
-    setPointsEarned(finalScore);
+    setPointsEarned(scoreCalc.totalScore);
     setIsCorrectAnswer(isCorrect);
     setShowPointsPopup(true);
   };
@@ -212,7 +191,6 @@ export default function QuizPage() {
     setFriendAdvice(null);
     setIsAnswered(false);
     setQuestionStartTime(Date.now());
-    setRainbowBonus(0); // Reset bonus for next question
   };
 
   const handleContinueToNext = () => {
@@ -286,12 +264,12 @@ export default function QuizPage() {
     <div className="min-h-screen flex items-center justify-center p-4 py-8" suppressHydrationWarning={true}>
       <div className="max-w-5xl mx-auto" suppressHydrationWarning={true}>
         {/* Header */}
-        <div className="mb-8 bg-white rounded-2xl p-8 border border-gray-200" suppressHydrationWarning={true}>
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+        <div className="mb-4 sm:mb-6 md:mb-8 bg-white rounded-2xl p-4 sm:p-6 md:p-8 border border-gray-200" suppressHydrationWarning={true}>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
             {/* PFP Display */}
             {pfpData && (
               <div className="flex-shrink-0">
-                <div className="w-16 h-16 rounded-full">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full">
                   <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
                     <Image
                       src={pfpData}
@@ -307,10 +285,10 @@ export default function QuizPage() {
 
             {/* Progress */}
             <div className="text-center md:text-left">
-              <h1 className="text-2xl font-bold text-black mb-2">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-black mb-1 sm:mb-2">
                 Question {currentQuestionIndex + 1} / {shuffledQuestions.length}
               </h1>
-              <div className="w-full md:w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="w-full md:w-64 h-1.5 sm:h-2 bg-gray-200 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${((currentQuestionIndex + 1) / shuffledQuestions.length) * 100}%` }}
@@ -329,14 +307,8 @@ export default function QuizPage() {
 
             {/* Score */}
             <div className="score-display">
-              <div className="text-sm">Score</div>
-              <div className="text-2xl font-bold">{score}</div>
-              {isRainbowWallet && (
-                <div className="text-xs text-purple-600 flex items-center gap-1 mt-1">
-                  <span>🌈</span>
-                  <span>+15%</span>
-                </div>
-              )}
+              <div className="text-xs sm:text-sm">Score</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold">{score}</div>
             </div>
           </div>
 
@@ -364,12 +336,12 @@ export default function QuizPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-6 flex flex-col sm:flex-row gap-4 justify-center items-center"
+            className="mt-4 sm:mt-5 md:mt-6 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center"
           >
             {selectedAnswer ? (
               <button
                 onClick={() => handleAnswer(selectedAnswer)}
-                className="btn-rainbow px-12 py-4 text-xl font-bold rounded-xl"
+                className="btn-rainbow px-8 sm:px-10 md:px-12 py-3 sm:py-4 text-lg sm:text-xl font-bold rounded-xl w-full sm:w-auto"
               >
                 Submit Answer
               </button>
@@ -377,11 +349,11 @@ export default function QuizPage() {
               <>
                 <button
                   onClick={handleSkip}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-8 py-4 text-lg font-medium rounded-xl transition-colors"
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-6 sm:px-7 md:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium rounded-xl transition-colors w-full sm:w-auto"
                 >
                   Skip Question ⏭️
                 </button>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-xs sm:text-sm">
                   Select an answer to submit or skip to continue
                 </p>
               </>
@@ -400,40 +372,35 @@ export default function QuizPage() {
             <motion.div
               initial={{ scale: 0.8, y: -20 }}
               animate={{ scale: 1, y: 0 }}
-              className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 text-center"
+              className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 max-w-sm w-full mx-4 text-center"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className={`text-6xl mb-4 ${isCorrectAnswer ? 'text-green-500' : 'text-gray-500'}`}>
+              <div className={`text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 ${isCorrectAnswer ? 'text-green-500' : 'text-gray-500'}`}>
                 {isCorrectAnswer ? '✅' : '❌'}
               </div>
 
-              <h3 className="text-2xl font-bold text-black mb-2">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-black mb-2">
                 {isCorrectAnswer ? 'Correct!' : pointsEarned === 0 ? 'Skipped' : 'Incorrect'}
               </h3>
 
-              <div className="mb-8">
-                <div className={`text-5xl font-bold mb-3 ${pointsEarned > 0 ? 'text-green-500' : 'text-gray-500'}`}>
+              <div className="mb-6 sm:mb-8">
+                <div className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-3 ${pointsEarned > 0 ? 'text-green-500' : 'text-gray-500'}`}>
                   {pointsEarned > 0 ? '+' : ''}{pointsEarned} pts
                 </div>
-                {isRainbowWallet && rainbowBonus > 0 && (
-                  <div className="text-sm text-purple-600 mb-2">
-                    🌈 +{rainbowBonus} Rainbow Wallet bonus!
-                  </div>
-                )}
-                <div className="text-gray-600 text-sm mb-6">
+                <div className="text-gray-600 text-xs sm:text-sm mb-4 sm:mb-6">
                   {pointsEarned === 0 && !isCorrectAnswer ? 'Question skipped' : `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`}
                 </div>
                 
                 <button
                   onClick={handleContinueToNext}
-                  className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg transition-all transform hover:scale-105 active:scale-95 hover:shadow-xl"
+                  className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 text-white py-3 sm:py-4 px-6 rounded-xl font-bold text-base sm:text-lg shadow-lg transition-all transform hover:scale-105 active:scale-95 hover:shadow-xl"
                 >
                   {isLastQuestion ? '🎯 View Results' : 'Next Question →'}
                 </button>
                 
                 <button
                   onClick={handleContinueToNext}
-                  className="mt-4 text-gray-500 hover:text-gray-700 text-sm font-medium"
+                  className="mt-3 sm:mt-4 text-gray-500 hover:text-gray-700 text-xs sm:text-sm font-medium"
                 >
                   or click anywhere to continue
                 </button>
@@ -453,32 +420,32 @@ export default function QuizPage() {
             <motion.div
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
-              className="bg-white rounded-2xl p-8 max-w-md w-full"
+              className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 max-w-md w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-2xl font-bold text-black mb-4">Network Thinks 🌐</h3>
-              <p className="text-gray-700 mb-4">Here's what the Rainbow community suggests...</p>
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-black mb-3 sm:mb-4">Network Thinks 🌐</h3>
+              <p className="text-gray-700 mb-3 sm:mb-4 text-sm sm:text-base">Here's what the Rainbow community suggests...</p>
               <div className="space-y-2">
                 {['A', 'B', 'C', 'D'].map(option => {
                   const isCorrect = option === currentQuestion.correct_answer;
                   const percentage = isCorrect ? 45 + Math.random() * 20 : Math.random() * 25;
                   return (
                     <div key={option} className="flex items-center gap-2">
-                      <span className="font-bold w-8">{option})</span>
-                      <div className="flex-1 bg-gray-200 rounded-full h-4">
+                      <span className="font-bold w-8 text-sm sm:text-base">{option})</span>
+                      <div className="flex-1 bg-gray-200 rounded-full h-3 sm:h-4">
                         <div
                           className="bg-purple-500 h-full rounded-full"
                           style={{ width: `${percentage}%` }}
                         />
                       </div>
-                      <span className="text-sm font-medium">{Math.round(percentage)}%</span>
+                      <span className="text-xs sm:text-sm font-medium">{Math.round(percentage)}%</span>
                     </div>
                   );
                 })}
               </div>
               <button
                 onClick={() => setShowNetworkVotes(false)}
-                className="mt-6 w-full bg-black text-white py-3 rounded-xl font-bold"
+                className="mt-4 sm:mt-6 w-full bg-black text-white py-2 sm:py-3 rounded-xl font-bold text-sm sm:text-base"
               >
                 Close
               </button>
@@ -496,16 +463,16 @@ export default function QuizPage() {
             <motion.div
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
-              className="bg-white rounded-2xl p-8 max-w-md w-full"
+              className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 max-w-md w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-2xl font-bold text-black mb-4">Friend Says 📞</h3>
-              <div className="bg-blue-50 rounded-xl p-4 mb-6">
-                <p className="text-lg text-black">{friendAdvice}</p>
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-black mb-3 sm:mb-4">Friend Says 📞</h3>
+              <div className="bg-blue-50 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
+                <p className="text-sm sm:text-base md:text-lg text-black">{friendAdvice}</p>
               </div>
               <button
                 onClick={() => setFriendAdvice(null)}
-                className="w-full bg-black text-white py-3 rounded-xl font-bold"
+                className="w-full bg-black text-white py-2 sm:py-3 rounded-xl font-bold text-sm sm:text-base"
               >
                 Thanks!
               </button>

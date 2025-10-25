@@ -64,21 +64,21 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen flex items-center justify-center py-8 sm:py-10 md:py-12 px-3 sm:px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header Card */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8 bg-white rounded-2xl p-8 border border-gray-200"
+          className="mb-4 sm:mb-6 md:mb-8 bg-white rounded-2xl p-4 sm:p-6 md:p-8 border border-gray-200"
         >
-          <h1 className="text-5xl font-bold mb-4 text-center">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 md:mb-4 text-center">
             <span className="bg-gradient-to-r from-red-500 via-yellow-500 to-purple-500 bg-clip-text text-transparent">
               Rainbownaire
             </span>
             {' '}Leaderboard
           </h1>
-          <p className="text-black text-lg text-center">
+          <p className="text-black text-sm sm:text-base md:text-lg text-center">
             🏆 Top Web3 Quiz Champions
           </p>
         </motion.div>
@@ -88,25 +88,23 @@ export default function LeaderboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex justify-center gap-4 mb-8"
+          className="flex justify-center gap-3 sm:gap-4 mb-4 sm:mb-6 md:mb-8"
         >
           <button
             onClick={() => setTimeFilter('week')}
-            className={`px-6 py-3 rounded-xl font-bold transition-all ${
-              timeFilter === 'week'
+            className={`px-4 sm:px-5 md:px-6 py-2 sm:py-3 rounded-xl font-bold transition-all text-sm sm:text-base ${timeFilter === 'week'
                 ? 'bg-yellow-400 text-black scale-105'
                 : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-            }`}
+              }`}
           >
             📅 This Week
           </button>
           <button
             onClick={() => setTimeFilter('allTime')}
-            className={`px-6 py-3 rounded-xl font-bold transition-all ${
-              timeFilter === 'allTime'
+            className={`px-4 sm:px-5 md:px-6 py-2 sm:py-3 rounded-xl font-bold transition-all text-sm sm:text-base ${timeFilter === 'allTime'
                 ? 'bg-yellow-400 text-black scale-105'
                 : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-            }`}
+              }`}
           >
             ♾️ All Time
           </button>
@@ -164,7 +162,7 @@ export default function LeaderboardPage() {
             ) : (
               <>
                 {/* Table Header */}
-                <div className="bg-gradient-to-r from-purple-100 to-blue-100 px-6 py-4 grid grid-cols-12 gap-4 font-bold text-black border-b-2 border-gray-200">
+                <div className="bg-gradient-to-r from-purple-100 to-blue-100 px-3 sm:px-4 md:px-6 py-3 sm:py-4 grid grid-cols-12 gap-2 sm:gap-3 md:gap-4 font-bold text-black border-b-2 border-gray-200 text-sm sm:text-base">
                   <div className="col-span-1">Rank</div>
                   <div className="col-span-4">Player</div>
                   <div className="col-span-2 text-center">Score</div>
@@ -180,18 +178,18 @@ export default function LeaderboardPage() {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.3 + index * 0.05 }}
-                      className={`px-6 py-4 grid grid-cols-12 gap-4 items-center hover:bg-gray-50 transition-colors ${
+                      className={`px-3 sm:px-4 md:px-6 py-3 sm:py-4 grid grid-cols-12 gap-2 sm:gap-3 md:gap-4 items-center hover:bg-gray-50 transition-colors ${
                         entry.rank <= 3 ? 'bg-yellow-50' : ''
                       }`}
                     >
                       {/* Rank */}
-                      <div className="col-span-1 text-2xl font-bold">
+                      <div className="col-span-1 text-lg sm:text-xl md:text-2xl font-bold">
                         {getMedalEmoji(entry.rank)}
                       </div>
 
                       {/* Player */}
                       <div className="col-span-4">
-                        <div className="font-bold text-black">
+                        <div className="font-bold text-black text-sm sm:text-base">
                           {entry.ens || `${entry.address.slice(0, 6)}...${entry.address.slice(-4)}`}
                         </div>
                         {entry.ens && (
@@ -203,7 +201,7 @@ export default function LeaderboardPage() {
 
                       {/* Score */}
                       <div className="col-span-2 text-center">
-                        <div className="text-2xl font-bold text-purple-600">
+                        <div className="text-lg sm:text-xl md:text-2xl font-bold text-purple-600">
                           {entry.score}
                         </div>
                         <div className="text-xs text-gray-500">points</div>
@@ -211,21 +209,21 @@ export default function LeaderboardPage() {
 
                       {/* Questions (hidden on mobile) */}
                       <div className="col-span-2 text-center hidden md:block">
-                        <div className="text-lg font-bold text-black">
+                        <div className="text-base sm:text-lg font-bold text-black">
                           {entry.questionsAnswered}/15
                         </div>
                       </div>
 
                       {/* Accuracy */}
                       <div className="col-span-3 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="w-full bg-gray-200 rounded-full h-2 max-w-[100px]">
+                        <div className="flex items-center justify-center gap-1 sm:gap-2">
+                          <div className="w-full bg-gray-200 rounded-full h-1.5 sm:h-2 max-w-[80px] sm:max-w-[100px]">
                             <div
-                              className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all"
+                              className="bg-gradient-to-r from-green-400 to-green-600 h-full rounded-full transition-all"
                               style={{ width: `${entry.accuracy}%` }}
                             />
                           </div>
-                          <span className="text-sm font-bold text-black min-w-[40px]">
+                          <span className="text-xs sm:text-sm font-bold text-black min-w-[30px] sm:min-w-[40px]">
                             {entry.accuracy}%
                           </span>
                         </div>
@@ -243,17 +241,17 @@ export default function LeaderboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="flex flex-col sm:flex-row gap-4 mt-8 justify-center"
+          className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4 sm:mt-6 md:mt-8 justify-center"
         >
           <button
             onClick={() => router.push('/welcome')}
-            className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold text-lg hover:scale-105 transition-transform shadow-lg"
+            className="px-6 sm:px-7 md:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold text-base sm:text-lg hover:scale-105 transition-transform shadow-lg w-full sm:w-auto"
           >
             🎮 Play Quiz
           </button>
           <button
             onClick={() => router.push('/')}
-            className="px-8 py-4 bg-gray-200 text-black rounded-xl font-bold text-lg hover:bg-gray-300 transition-colors"
+            className="px-6 sm:px-7 md:px-8 py-3 sm:py-4 bg-gray-200 text-black rounded-xl font-bold text-base sm:text-lg hover:bg-gray-300 transition-colors w-full sm:w-auto"
           >
             🏠 Home
           </button>
@@ -264,10 +262,10 @@ export default function LeaderboardPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="text-center mt-8 text-gray-600 text-sm"
+          className="text-center mt-4 sm:mt-6 md:mt-8 text-gray-600 text-xs sm:text-sm"
         >
           <p>🌈 Connect your wallet and climb the leaderboard!</p>
-          <p className="mt-2">Scores are calculated based on accuracy, speed, and lifeline usage.</p>
+          <p className="mt-1 sm:mt-2">Scores are calculated based on accuracy, speed, and lifeline usage.</p>
         </motion.div>
       </div>
     </div>

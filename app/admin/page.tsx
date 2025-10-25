@@ -22,6 +22,18 @@ export default function AdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  const capitalizeFirst = (str: string): string => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
+  const formatCategory = (category: string): string => {
+    // Convert snake_case to title case and handle special cases
+    return category
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   const handleGenerate = async () => {
     setIsGenerating(true);
     setError(null);
@@ -220,7 +232,7 @@ export default function AdminPage() {
                     q.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700' :
                     'bg-red-100 text-red-700'
                   }`}>
-                    {q.difficulty.toUpperCase()}
+                    {capitalizeFirst(q.difficulty)}
                   </span>
                 </div>
 

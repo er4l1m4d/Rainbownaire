@@ -74,7 +74,7 @@ export function PFPManager({
   const displayUrl = previewUrl || currentPFP;
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2 sm:gap-3">
       <div className="relative">
         <motion.div
           className={`${sizeClasses[size]} rounded-full cursor-pointer hover:scale-105 transition-transform`}
@@ -106,7 +106,7 @@ export function PFPManager({
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  className="text-2xl font-bold text-gray-400"
+                  className="text-lg sm:text-xl md:text-2xl font-bold text-gray-400"
                 >
                   👤
                 </motion.div>
@@ -119,7 +119,7 @@ export function PFPManager({
                 animate={{ opacity: 1 }}
                 className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center"
               >
-                <div className="spinner-rainbow w-4 h-4"></div>
+                <div className="spinner-rainbow w-3 h-3 sm:w-4 sm:h-4"></div>
               </motion.div>
             )}
           </div>
@@ -127,7 +127,7 @@ export function PFPManager({
 
         {/* Upload indicator */}
         <motion.div
-          className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold"
+          className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold"
           initial={{ scale: 0 }}
           animate={{ scale: displayUrl ? 1 : 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -136,10 +136,10 @@ export function PFPManager({
         </motion.div>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1 sm:gap-2">
         <motion.button
           onClick={handleClick}
-          className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg transition-colors"
+          className="px-2 sm:px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm rounded-lg transition-colors"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           disabled={isUploading}
@@ -150,7 +150,7 @@ export function PFPManager({
         {showRemove && displayUrl && (
           <motion.button
             onClick={handleRemovePFP}
-            className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded-lg transition-colors"
+            className="px-2 sm:px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-xs sm:text-sm rounded-lg transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             initial={{ opacity: 0, y: 10 }}

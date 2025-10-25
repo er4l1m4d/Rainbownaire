@@ -38,7 +38,7 @@ export default function WelcomePage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-3 sm:p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -50,12 +50,12 @@ export default function WelcomePage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-8 bg-white rounded-2xl p-8 border border-gray-200"
+          className="mb-4 sm:mb-6 md:mb-8 bg-white rounded-2xl p-4 sm:p-6 md:p-8 border border-gray-200"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-black mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-2 sm:mb-3 md:mb-4">
             Ready to Become a <span className="rainbow-text">Rainbownaire</span>?
           </h1>
-          <p className="text-lg text-gray-700 mb-2">
+          <p className="text-sm sm:text-base md:text-lg text-gray-700 mb-2">
             Connected as: <span className="font-mono text-black">{getDisplayName(address, nickname)}</span>
           </p>
         </motion.div>
@@ -65,40 +65,40 @@ export default function WelcomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-2xl p-8 border border-gray-200"
+          className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 border border-gray-200"
         >
-          <h2 className="text-2xl font-bold text-black mb-6">How to Play</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-black mb-4 sm:mb-6">How to Play</h2>
           
-          <div className="space-y-4 text-left">
+          <div className="space-y-3 sm:space-y-4 text-left">
             <div className="flex items-start gap-3">
-              <div className="text-2xl">🎯</div>
+              <div className="text-xl sm:text-2xl">🎯</div>
               <div>
                 <h3 className="font-bold text-black mb-1">15 Questions</h3>
-                <p className="text-gray-700">Answer progressively harder questions about Rainbow Wallet and Web3</p>
+                <p className="text-gray-700 text-sm sm:text-base">Answer progressively harder questions about Rainbow Wallet and Web3</p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="text-2xl">⏱️</div>
+              <div className="text-xl sm:text-2xl">⏱️</div>
               <div>
                 <h3 className="font-bold text-black mb-1">20 Seconds Each</h3>
-                <p className="text-gray-700">You have 20 seconds to answer each question</p>
+                <p className="text-gray-700 text-sm sm:text-base">You have 20 seconds to answer each question</p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="text-2xl">💡</div>
+              <div className="text-xl sm:text-2xl">💡</div>
               <div>
                 <h3 className="font-bold text-black mb-1">3 Lifelines</h3>
-                <p className="text-gray-700">50:50, Ask the Network, and Phone a Friend</p>
+                <p className="text-gray-700 text-sm sm:text-base">50:50, Ask the Network, and Phone a Friend</p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="text-2xl">💯</div>
+              <div className="text-xl sm:text-2xl">💯</div>
               <div>
                 <h3 className="font-bold text-black mb-1">Earn Points</h3>
-                <p className="text-gray-700">Correct: +100pts | Fast bonus: +25pts | Streak: +50pts</p>
+                <p className="text-gray-700 text-sm sm:text-base">Correct: +100pts | Fast bonus: +25pts | Streak: +50pts</p>
               </div>
             </div>
           </div>
@@ -109,16 +109,16 @@ export default function WelcomePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="mt-8"
+          className="mt-4 sm:mt-6 md:mt-8"
         >
           <button
             onClick={handleStartGame}
             disabled={isStarting}
-            className="btn-rainbow text-xl px-12 py-4 rounded-xl font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-rainbow text-lg sm:text-xl px-8 sm:px-10 md:px-12 py-3 sm:py-4 rounded-xl font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
           >
             {isStarting ? (
               <div className="flex items-center gap-2">
-                <div className="spinner-rainbow w-5 h-5"></div>
+                <div className="spinner-rainbow w-4 h-4"></div>
                 Starting...
               </div>
             ) : (
@@ -128,7 +128,7 @@ export default function WelcomePage() {
 
           <button
             onClick={() => router.push('/')}
-            className="mt-4 block mx-auto text-gray-600 hover:text-black transition-colors"
+            className="mt-3 sm:mt-4 block mx-auto text-gray-600 hover:text-black transition-colors text-sm sm:text-base"
           >
             ← Back to Home
           </button>

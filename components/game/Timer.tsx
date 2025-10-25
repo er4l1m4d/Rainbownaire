@@ -45,15 +45,15 @@ export function Timer({
   }, [timeLeft, isPaused, onTimeUp, onTick]);
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
       {/* Timer Display */}
-      <div className="flex items-center gap-2">
-        <span className="text-2xl">⏱️</span>
+      <div className="flex items-center gap-1 sm:gap-2">
+        <span className="text-lg sm:text-xl md:text-2xl">⏱️</span>
         <motion.span
           key={timeLeft}
           initial={{ scale: 1.2 }}
           animate={{ scale: 1 }}
-          className={`text-3xl font-bold ${
+          className={`text-xl sm:text-2xl md:text-3xl font-bold ${
             isWarning ? 'text-red-500' : 'text-black'
           }`}
         >

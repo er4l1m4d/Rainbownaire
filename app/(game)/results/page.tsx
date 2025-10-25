@@ -39,9 +39,8 @@ function ResultsContent() {
   const accuracyPercentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
   const rank = getScoreRank(score);
 
-  // Calculate Rainbow Wallet bonus (15% of base score)
-  const baseScore = Math.round(score / 1.15); // Reverse calculate base score
-  const rainbowBonus = score - baseScore;
+  // No Rainbow bonus calculation needed
+  const rainbowBonus = 0;
 
   // Tweet text for social sharing
   const tweetText = `I just scored ${score} points in Rainbownaire quiz! 🌈 ${rank} Can you beat my score?`;
@@ -202,42 +201,42 @@ function ResultsContent() {
       >
         {/* Score Card */}
         <motion.div
-          className="bg-white rounded-2xl p-8 border border-gray-200"
+          className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 border border-gray-200"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
           {/* Congratulations Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <div className="text-center mb-4 sm:mb-6 md:mb-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 md:mb-4">
               <span className="rainbow-text">Congratulations!</span>
             </h1>
-            <p className="text-xl text-black font-bold">
+            <p className="text-lg sm:text-xl text-black font-bold">
               You've completed the quiz! 🎉
             </p>
           </div>
 
           {/* Final Score */}
-          <div className="mb-8">
-            <div className="text-gray-700 text-lg mb-2">Your Final Score</div>
+          <div className="mb-4 sm:mb-6 md:mb-8">
+            <div className="text-gray-700 text-sm sm:text-base md:text-lg mb-2">Your Final Score</div>
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.6, type: 'spring' }}
-              className="text-7xl font-bold text-black mb-4"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-2 sm:mb-3 md:mb-4"
             >
               {score}
             </motion.div>
             {rainbowBonus > 0 && (
-              <div className="text-sm text-purple-600 mb-2 flex items-center justify-center gap-1">
+              <div className="text-xs sm:text-sm text-purple-600 mb-2 flex items-center justify-center gap-1">
                 <span>🌈</span>
                 <span>+{rainbowBonus} Rainbow Wallet bonus!</span>
               </div>
             )}
-            <div className="text-2xl font-bold text-purple-600 mb-4">{rank}</div>
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-purple-600 mb-3 sm:mb-4">{rank}</div>
             
             {/* Progress Bar */}
-            <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+            <div className="w-full h-3 sm:h-4 bg-gray-200 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${accuracyPercentage}%` }}
@@ -245,21 +244,21 @@ function ResultsContent() {
                 className="h-full progress-rainbow"
               />
             </div>
-            <div className="text-sm text-gray-600 mt-2">{accuracyPercentage}% of questions answered correctly</div>
+            <div className="text-xs sm:text-sm text-gray-600 mt-2">{accuracyPercentage}% of questions answered correctly</div>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-xl p-4">
-              <div className="text-3xl mb-2">📊</div>
-              <div className="text-2xl font-bold text-black">{totalQuestions}</div>
-              <div className="text-sm text-gray-600">Questions</div>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="bg-white rounded-xl p-3 sm:p-4">
+              <div className="text-2xl sm:text-3xl mb-2">📊</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-black">{totalQuestions}</div>
+              <div className="text-xs sm:text-sm text-gray-600">Questions</div>
             </div>
             
-            <div className="bg-white rounded-xl p-4">
-              <div className="text-3xl mb-2">💯</div>
-              <div className="text-2xl font-bold text-black">{accuracyPercentage}%</div>
-              <div className="text-sm text-gray-600">Accuracy</div>
+            <div className="bg-white rounded-xl p-3 sm:p-4">
+              <div className="text-2xl sm:text-3xl mb-2">💯</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-black">{accuracyPercentage}%</div>
+              <div className="text-xs sm:text-sm text-gray-600">Accuracy</div>
             </div>
           </div>
         </motion.div>
@@ -269,7 +268,7 @@ function ResultsContent() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="space-y-4 mt-8"
+          className="space-y-3 sm:space-y-4 mt-4 sm:mt-6 md:mt-8"
         >
           <button
             onClick={() => {
@@ -278,11 +277,11 @@ function ResultsContent() {
               setTimeout(() => setIsGeneratingScorecard(false), 1000);
             }}
             disabled={isGeneratingScorecard}
-            className="btn-rainbow text-xl px-12 py-4 rounded-xl font-bold shadow-lg w-full disabled:opacity-50"
+            className="btn-rainbow text-lg sm:text-xl px-8 sm:px-10 md:px-12 py-3 sm:py-4 rounded-xl font-bold shadow-lg w-full disabled:opacity-50"
           >
             {isGeneratingScorecard ? (
               <div className="flex items-center justify-center gap-2">
-                <div className="spinner-rainbow w-5 h-5"></div>
+                <div className="spinner-rainbow w-4 h-4"></div>
                 Generating PNG...
               </div>
             ) : (
@@ -291,22 +290,22 @@ function ResultsContent() {
           </button>
 
           {/* Sharing text */}
-          <p className="text-gray-600 text-sm text-center mb-4">
+          <p className="text-gray-600 text-xs sm:text-sm text-center mb-3 sm:mb-4">
             Share your score with friends and challenge them! 🚀
           </p>
 
           {/* Two buttons side by side */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <button
               onClick={() => router.push('/welcome')}
-              className="bg-purple-600 hover:bg-purple-700 text-white text-lg px-8 py-4 rounded-xl font-bold shadow-lg transition-all duration-200"
+              className="bg-purple-600 hover:bg-purple-700 text-white text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-xl font-bold shadow-lg transition-all duration-200"
             >
               🔁 Play Again
             </button>
 
             <button
               onClick={() => router.push('/leaderboard')}
-              className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-8 rounded-xl transition-all duration-200 shadow-md"
+              className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 sm:py-4 px-4 sm:px-6 md:px-8 rounded-xl transition-all duration-200 shadow-md text-sm sm:text-base md:text-lg"
             >
               🏆 View Leaderboard
             </button>
@@ -314,7 +313,7 @@ function ResultsContent() {
 
           <button
             onClick={() => router.push('/')}
-            className="text-gray-600 hover:text-black transition-colors"
+            className="text-gray-600 hover:text-black transition-colors text-sm sm:text-base"
           >
             ← Back to Home
           </button>
@@ -501,29 +500,29 @@ function ResultsContent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-3 sm:p-4 z-50"
             onClick={() => setShowScorecardPreview(false)}
           >
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
-              className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 relative max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-xl p-4 sm:p-5 md:p-6 max-w-2xl w-full mx-4 relative max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => setShowScorecardPreview(false)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl z-10"
+                className="absolute top-3 sm:top-4 right-3 sm:right-4 text-gray-400 hover:text-gray-600 text-xl sm:text-2xl z-10"
               >
                 ×
               </button>
 
-              <h3 className="text-xl font-bold mb-6 text-center">
+              <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-center">
                 {scorecardImageUrl ? 'Your Scorecard Image' : 'Share Your Scorecard'}
               </h3>
 
               {/* PNG Image Preview or Live Preview */}
-              <div className="mb-6">
+              <div className="mb-4 sm:mb-6">
                 {scorecardImageUrl ? (
                   <div className="text-center">
                     <img
@@ -531,83 +530,128 @@ function ResultsContent() {
                       alt="Scorecard"
                       className="w-full max-w-md mx-auto h-auto rounded-lg shadow-lg"
                     />
-                    <p className="text-sm text-gray-600 mt-3">
-                      💡 Tip: You can share this image directly to social media, messaging apps, or anywhere images are supported!
-                    </p>
                   </div>
                 ) : (
-                  <div className="text-center p-8">
-                    <p className="text-gray-600">Generating your scorecard...</p>
+                  <div className="text-center p-6 sm:p-8">
+                    <p className="text-gray-600 text-sm sm:text-base">Generating your scorecard...</p>
                   </div>
                 )}
               </div>
 
               {/* Action Buttons */}
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {scorecardImageUrl ? (
                   <>
-                    <p className="text-center text-gray-600 mb-4">Choose how to share your scorecard! 🎉</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <p className="text-center text-gray-600 mb-3 sm:mb-4 text-sm sm:text-base">Choose how to share your scorecard! 🎉</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-6">
                       <button
                         onClick={downloadScorecard}
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                       >
                         📥 Download PNG
                       </button>
 
                       <button
                         onClick={copyImageToClipboard}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                       >
                         🖼️ Copy Image
                       </button>
 
                       <button
                         onClick={handleShare}
-                        className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                        className="bg-gray-800 hover:bg-gray-900 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                       >
                         📱 Share Link
                       </button>
 
                       <button
                         onClick={handleTwitterShare}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                       >
                         🐦 Share on Twitter
                       </button>
                     </div>
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600 mb-2">💙 Loving the quiz?</p>
+                      <p className="text-sm text-gray-600">
+                        Don't forget to follow{' '}
+                        <a
+                          href="https://x.com/davee0x"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-purple-600 hover:text-purple-800 underline font-medium"
+                        >
+                          Dave
+                        </a>
+                        {' '}&{' '}
+                        <a
+                          href="https://x.com/jigz_crypto"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-purple-600 hover:text-purple-800 underline font-medium"
+                        >
+                          Jigz
+                        </a>
+                        {' '}for more updates!
+                      </p>
+                    </div>
                   </>
                 ) : (
                   <>
-                    <p className="text-center text-gray-600 mb-4">Generate your scorecard image to share! 🎉</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <p className="text-center text-gray-600 mb-3 sm:mb-4 text-sm sm:text-base">Generate your scorecard image to share! 🎉</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-6">
                       <button
                         onClick={downloadScorecard}
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                       >
                         🎨 Generate PNG
                       </button>
 
                       <button
                         onClick={handleShare}
-                        className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                        className="bg-gray-800 hover:bg-gray-900 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                       >
                         📱 Share Link
                       </button>
 
                       <button
                         onClick={handleTwitterShare}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                       >
                         🐦 Share on Twitter
                       </button>
 
                       <button
                         onClick={() => setShowScorecardPreview(false)}
-                        className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-3 rounded-lg font-medium transition-colors"
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base"
                       >
                         Close Preview
                       </button>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600 mb-2">💙 Loving the quiz?</p>
+                      <p className="text-sm text-gray-600">
+                        Don't forget to follow{' '}
+                        <a
+                          href="https://x.com/davee0x"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-purple-600 hover:text-purple-800 underline font-medium"
+                        >
+                          Dave
+                        </a>
+                        {' '}&{' '}
+                        <a
+                          href="https://x.com/jigz_crypto"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-purple-600 hover:text-purple-800 underline font-medium"
+                        >
+                          Jigz
+                        </a>
+                        {' '}for more updates!
+                      </p>
                     </div>
                   </>
                 )}
