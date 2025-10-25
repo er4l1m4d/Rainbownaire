@@ -12,12 +12,12 @@ import { Question, LifelinesUsed, LifelineType } from '@/types/game';
 import { LifelineManager } from '@/lib/utils/lifelineLogic';
 import { calculateQuestionScore } from '@/lib/utils/scoring';
 import { usePFP } from '@/hooks/usePFP';
-import { shuffleArray } from '@/lib/utils/user';
+import { shuffleArray, getStoredNickname } from '@/lib/utils/user';
 import Image from 'next/image';
 
 export default function QuizPage() {
   const router = useRouter();
-  const { isConnected, connector } = useAccount();
+  const { isConnected, address } = useAccount();
 
   // PFP management
   const { pfpData } = usePFP();
@@ -193,12 +193,37 @@ export default function QuizPage() {
     setQuestionStartTime(Date.now());
   };
 
-  const handleContinueToNext = () => {
+  const handleContinueToNext = async () => {
     setShowPointsPopup(false);
 
     // Move to next question after showing popup
-    setTimeout(() => {
+    setTimeout(async () => {
       if (isLastQuestion) {
+        // Submit score to leaderboard before showing results
+        if (address) {
+          try {
+            // Get nickname from localStorage
+            const nickname = getStoredNickname(address);
+
+            await fetch('/api/leaderboard', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                playerAddress: address,
+                score: score,
+                correctAnswers: correctAnswers,
+                totalQuestions: shuffledQuestions.length,
+                displayName: nickname, // Include nickname from localStorage
+              }),
+            });
+          } catch (error) {
+            console.error('Failed to submit score to leaderboard:', error);
+            // Continue to results even if leaderboard submission fails
+          }
+        }
+
         router.push(`/results?score=${score}&correct=${correctAnswers}`);
       } else {
         nextQuestion();

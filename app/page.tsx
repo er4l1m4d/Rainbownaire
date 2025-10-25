@@ -54,11 +54,33 @@ export default function HomePage() {
       setConnectionError(null);
     }
   }, [isConnected]);
-  const handleSetNickname = () => {
+  const handleSetNickname = async () => {
     if (newNickname.trim() && address) {
       const trimmedNickname = newNickname.trim();
       setNickname(trimmedNickname);
       storeNickname(address, trimmedNickname);
+
+      // Also update nickname in database if possible
+      try {
+        await fetch('/api/leaderboard', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            playerAddress: address,
+            score: 0, // Not submitting a score, just updating nickname
+            correctAnswers: 0,
+            totalQuestions: 0,
+            displayName: trimmedNickname,
+            updateOnly: true, // Flag to indicate this is just a nickname update
+          }),
+        });
+      } catch (error) {
+        console.error('Failed to update nickname in database:', error);
+        // Continue anyway - localStorage is the primary storage
+      }
+
       setShowNicknameModal(false);
       setNewNickname('');
     }

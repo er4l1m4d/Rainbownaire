@@ -33,7 +33,8 @@ export default function LeaderboardPage() {
       const response = await fetch(`/api/leaderboard?timeFilter=${filter}&limit=50`);
 
       if (!response.ok) {
-        throw new Error('Failed to fetch leaderboard data');
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
       }
 
       const result = await response.json();
@@ -134,7 +135,15 @@ export default function LeaderboardPage() {
             <div className="bg-red-50 border border-red-200 rounded-xl p-6 max-w-md mx-auto">
               <div className="text-red-600 text-4xl mb-4">⚠️</div>
               <h3 className="text-lg font-bold text-red-800 mb-2">Error Loading Leaderboard</h3>
-              <p className="text-red-600 text-sm">{error}</p>
+              <p className="text-red-600 text-sm mb-4">{error}</p>
+              <div className="text-xs text-gray-500 mb-4">
+                This might be due to:
+                <ul className="list-disc list-inside mt-2 text-left">
+                  <li>Missing database configuration</li>
+                  <li>Network connectivity issues</li>
+                  <li>No quiz scores submitted yet</li>
+                </ul>
+              </div>
               <button
                 onClick={() => fetchLeaderboardData(timeFilter)}
                 className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
@@ -156,8 +165,16 @@ export default function LeaderboardPage() {
             {leaderboardData.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
                 <div className="text-4xl mb-4">🏆</div>
-                <p>No leaderboard data available yet.</p>
-                <p className="text-sm mt-2">Be the first to set a high score!</p>
+                <p className="text-lg font-medium mb-2">No leaderboard data available yet.</p>
+                <p className="text-sm mb-6">Be the first to set a high score!</p>
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 max-w-md mx-auto text-left">
+                  <h4 className="font-medium text-blue-800 mb-2">How to get on the leaderboard:</h4>
+                  <ol className="text-sm text-blue-700 list-decimal list-inside space-y-1">
+                    <li>Complete a full quiz (15 questions)</li>
+                    <li>Your score will be automatically submitted</li>
+                    <li>Check back here to see your ranking!</li>
+                  </ol>
+                </div>
               </div>
             ) : (
               <>
