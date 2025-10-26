@@ -36,7 +36,7 @@
     "correct_answer": "B"
   },
   {
-    "difficulty": "hard",
+    "difficulty": "Hard",
     "question": "Which of these KOLs lack the 'bald' trait?",
     "options": {
       "A": "LoshmiOnChain",
@@ -44,13 +44,10 @@
       "C": "Banditxbt",
       "D": "Ripchillpill"
     },
-    "correct_answer": "B",
-    "category": "rainbow_wallet",
-    "source_type": "manual",
-    "created_at": "2024-01-01T00:00:00.000Z"
+    "correct_answer": "B"
   },
   {
-    "difficulty": "hard",
+    "difficulty": "Hard",
     "question": "Rainbow Wallet integrates ENS for what primary feature?",
     "options": {
       "A": "Gas Fee Optimization",
@@ -58,13 +55,10 @@
       "C": "NFT Verification",
       "D": "Token Discovery"
     },
-    "correct_answer": "B",
-    "category": "rainbow_wallet",
-    "source_type": "manual",
-    "created_at": "2024-01-01T00:00:00.000Z"
+    "correct_answer": "B"
   },
   {
-    "difficulty": "hard",
+    "difficulty": "Hard",
     "question": "Which company originally built Rainbow Wallet?",
     "options": {
       "A": "Consensys",
@@ -72,10 +66,7 @@
       "C": "Carpenter Group",
       "D": "Rainbow Labs"
     },
-    "correct_answer": "D",
-    "category": "rainbow_wallet",
-    "source_type": "manual",
-    "created_at": "2024-01-01T00:00:00.000Z"
+    "correct_answer": "D"
   },
   {
     "difficulty": "Hard",

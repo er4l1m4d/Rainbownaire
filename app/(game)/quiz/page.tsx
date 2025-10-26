@@ -43,8 +43,11 @@ export default function QuizPage() {
 
   // Initialize shuffled questions when component mounts
   useEffect(() => {
-    // Get 15 random questions from the full question pool
-    const randomQuestions = getRandomQuestions(15);
+    // Create a session-based seed for consistent randomization per quiz session
+    const sessionSeed = `${address || 'anonymous'}-${Date.now()}-${Math.random()}`;
+
+    // Get 15 random questions from the full question pool with session-based seeding
+    const randomQuestions = getRandomQuestions(15, sessionSeed);
 
     if (randomQuestions && randomQuestions.length > 0) {
       // Shuffle questions order
