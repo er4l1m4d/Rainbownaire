@@ -3,14 +3,14 @@
 import { ConnectButton, useAccountModal } from '@rainbow-me/rainbowkit';
 import { useAccount, useDisconnect } from 'wagmi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getDisplayName, getStoredNickname, storeNickname } from '@/lib/utils/user';
 import { PFPManager } from '@/components/ui/PFPManager';
 import { usePFP } from '@/hooks/usePFP';
 
-export default function HomePage() {
+const HomePage = memo(function HomePage() {
   const { isConnected, address } = useAccount();
   const { disconnect } = useDisconnect();
   const [isLoading, setIsLoading] = useState(false);
@@ -24,16 +24,22 @@ export default function HomePage() {
   // PFP management
   const { pfpData, updatePFP } = usePFP();
 
-  // Load nickname from localStorage on mount
+  // Memoized nickname loading to prevent unnecessary re-renders
+  const loadNickname = useCallback((walletAddress: string) => {
+    const storedNickname = getStoredNickname(walletAddress);
+    if (storedNickname) {
+      setNickname(storedNickname);
+    }
+  }, []);
+
+  // Load nickname from localStorage on mount - optimized
   useEffect(() => {
     if (address) {
-      const storedNickname = getStoredNickname(address);
-      if (storedNickname) {
-        setNickname(storedNickname);
-      }
+      loadNickname(address);
     }
-  }, [address]);
-  // Handle wallet connection errors
+  }, [address, loadNickname]);
+
+  // Handle wallet connection errors - optimized
   useEffect(() => {
     const handleConnectionError = () => {
       setConnectionError('Failed to connect to wallet. Please make sure your wallet is installed and try again.');
@@ -54,13 +60,15 @@ export default function HomePage() {
       setConnectionError(null);
     }
   }, [isConnected]);
-  const handleSetNickname = async () => {
+
+  // Memoized nickname handler to prevent unnecessary re-renders
+  const handleSetNickname = useCallback(async () => {
     if (newNickname.trim() && address) {
       const trimmedNickname = newNickname.trim();
       setNickname(trimmedNickname);
       storeNickname(address, trimmedNickname);
 
-      // Also update nickname in database if possible
+      // Update nickname in database asynchronously (don't block UI)
       try {
         await fetch('/api/leaderboard', {
           method: 'POST',
@@ -69,22 +77,22 @@ export default function HomePage() {
           },
           body: JSON.stringify({
             playerAddress: address,
-            score: 0, // Not submitting a score, just updating nickname
+            score: 0,
             correctAnswers: 0,
             totalQuestions: 0,
             displayName: trimmedNickname,
-            updateOnly: true, // Flag to indicate this is just a nickname update
+            updateOnly: true,
           }),
         });
       } catch (error) {
         console.error('Failed to update nickname in database:', error);
-        // Continue anyway - localStorage is the primary storage
+        // Don't show error to user - localStorage is primary storage
       }
 
       setShowNicknameModal(false);
       setNewNickname('');
     }
-  };
+  }, [newNickname, address]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" suppressHydrationWarning={true}>
@@ -323,4 +331,6 @@ export default function HomePage() {
       </div>
     </div>
   );
-}
+});
+
+export default HomePage;

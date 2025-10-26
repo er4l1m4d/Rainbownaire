@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
@@ -11,7 +11,7 @@ interface PFPManagerProps {
   showRemove?: boolean;
 }
 
-export function PFPManager({
+export const PFPManager = memo(function PFPManager({
   currentPFP,
   onPFPChange,
   size = 'md',
@@ -170,4 +170,4 @@ export function PFPManager({
       />
     </div>
   );
-}
+});
