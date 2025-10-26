@@ -185,39 +185,6 @@ export default function LeaderboardPage() {
                     </ol>
                   </div>
                 )}
-              <div className="text-xs text-gray-500 mb-4">
-                {error.includes('Database not configured') && (
-                  <div className="text-left">
-                    <p className="font-medium mb-2">To fix this:</p>
-                    <ol className="list-decimal list-inside space-y-1">
-                      <li>Go to your Vercel dashboard</li>
-                      <li>Navigate to Project Settings → Environment Variables</li>
-                      <li>Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY</li>
-                      <li>Redeploy your project</li>
-                    </ol>
-                  </div>
-                )}
-                {error.includes('Database tables not set up') && (
-                  <div className="text-left">
-                    <p className="font-medium mb-2">To fix this:</p>
-                    <ol className="list-decimal list-inside space-y-1">
-                      <li>Go to your Supabase dashboard</li>
-                      <li>Navigate to SQL Editor</li>
-                      <li>Copy the SQL from setup_database_minimal.sql</li>
-                      <li>Run the SQL to create the required tables</li>
-                    </ol>
-                  </div>
-                )}
-                {error.includes('No scores submitted yet') && (
-                  <div className="text-left">
-                    <p className="font-medium mb-2">To get started:</p>
-                    <ol className="list-decimal list-inside space-y-1">
-                      <li>Complete a full quiz (15 questions)</li>
-                      <li>Your score will be automatically submitted</li>
-                      <li>Check back here to see your ranking!</li>
-                    </ol>
-                  </div>
-                )}
                 {error.includes('Cannot connect to database') && (
                   <div className="text-left">
                     <p className="font-medium mb-2">To fix this:</p>

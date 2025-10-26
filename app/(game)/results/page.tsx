@@ -50,7 +50,6 @@ function ResultsContent() {
   const [showScorecardPreview, setShowScorecardPreview] = useState(false);
   const [isGeneratingScorecard, setIsGeneratingScorecard] = useState(false);
   const [nickname, setNickname] = useState<string>('');
-  const [pfpData, setPfpData] = useState<string | null>(null);
 
   // Load user's nickname
   useEffect(() => {
